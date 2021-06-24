@@ -258,6 +258,7 @@ class RoomWrapper extends Component {
 
   connectToSocket = () => {
     const socket = io(server_url);
+    console.log(server_url);
     const self = this;
     this.socket = socket;
     socket.on("connect", () => {

@@ -55,8 +55,8 @@ class Navbar extends Component {
           </div>
           <div className='navbar-icons'>
             {this.state.token ? (
-              <div className='flex-row'>
-                <div>
+              <div className='flex-row-cst'>
+                <div style={{ marginRight: "2rem" }}>
                   <Typography>{this.state.user}</Typography>
                 </div>
                 <div>

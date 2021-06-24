@@ -13,8 +13,8 @@ const AskBeforeEntering = (props) => {
     loading,
   } = props;
   return (
-    <div className="flex-row">
-      <div id="my-video">
+    <div className='flex-row'>
+      <div id='my-video'>
         <video
           ref={myVideoRef}
           autoPlay
@@ -22,14 +22,14 @@ const AskBeforeEntering = (props) => {
           className={videoOn ? "video-element" : "blank-video"}
         ></video>
         <Toolbar
-          className="options-bar join-call"
+          className='options-bar join-call'
           style={{ background: "#5a5a5a" }}
         >
-          <div className="call-options">
-            <IconButton color="inherit" onClick={toggleMicState}>
+          <div className='call-options'>
+            <IconButton color='inherit' onClick={toggleMicState}>
               {micOn ? <Mic /> : <MicOff />}
             </IconButton>
-            <IconButton color="inherit" onClick={toggleCameraState}>
+            <IconButton color='inherit' onClick={toggleCameraState}>
               {videoOn ? <Videocam /> : <VideocamOff />}
             </IconButton>
           </div>

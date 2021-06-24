@@ -28,9 +28,14 @@
 }
 
 .call-options {
-  width: 15%;
+  width: 20%;
   display: flex;
   justify-content: space-between;
+}
+
+#my-video {
+  width: 640px;
+  height: 480px;
 }
 
 .joining-info {
@@ -63,12 +68,14 @@
   width: 100% !important;
   object-fit: fill;
   border-radius: 10px 10px 0 0;
+  margin-right: 0;
 }
 
 .join-call {
   justify-content: center;
   margin-top: -1%;
   border-radius: 0 0 10px 10px;
+  margin-right: 0;
 }
 
 .flex-row {
