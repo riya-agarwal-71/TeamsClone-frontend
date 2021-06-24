@@ -140,6 +140,7 @@ class Login extends Component {
             </Typography>
           </Paper>
         </form>
+        {this.props.location.state && <div>Continue As guest ?</div>}
       </div>
     );
   }

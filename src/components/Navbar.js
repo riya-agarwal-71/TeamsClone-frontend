@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import jwt_decode from "jwt-decode";
+// import jwt_decode from "jwt-decode";
 import {
   AppBar,
   Toolbar,
@@ -14,24 +14,12 @@ import {
 // import { Menu, Search } from "@material-ui/icons";
 
 import "../styles/navbar.scss";
+import { logout } from "../actions/auth";
 
 class Navbar extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      token: localStorage.token,
-      user: "",
-    };
-  }
-
-  componentDidMount = () => {
-    if (!this.state.token) {
-      return;
-    }
-    var user = jwt_decode(this.state.token);
-    this.setState({
-      user: user.name,
-    });
+  handleLogout = () => {
+    localStorage.removeItem("token");
+    this.props.dispatch(logout());
   };
 
   render() {
@@ -54,13 +42,15 @@ class Navbar extends Component {
             <InputBase placeholder="Search" className="search-input" /> */}
           </div>
           <div className='navbar-icons'>
-            {this.state.token ? (
+            {this.props.auth.isLoggedIn ? (
               <div className='flex-row-cst'>
                 <div style={{ marginRight: "2rem" }}>
-                  <Typography>{this.state.user}</Typography>
+                  <Typography>{this.props.auth.user.name}</Typography>
                 </div>
                 <div>
-                  <Button color='inherit'>Logout</Button>
+                  <Button color='inherit' onClick={this.handleLogout}>
+                    Logout
+                  </Button>
                 </div>
               </div>
             ) : (

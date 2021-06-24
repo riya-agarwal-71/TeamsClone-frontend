@@ -8,3 +8,7 @@ export const SIGNUP_SUCCESSFULL = "SIGN_UP_SUCCESSFULL";
 export const SIGNUP_FAILED = "SIGN_UP_FAILED";
 
 export const CLEAR_STATE = "CLEAR_STATE";
+
+export const LOGOUT = "LOGOUT";
+
+export const AUTHENTICATE_USER = "AUTHENTICATE_USER";

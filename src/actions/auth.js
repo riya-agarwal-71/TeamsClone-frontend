@@ -6,6 +6,8 @@ import {
   SIGNUP_SUCCESSFULL,
   START_SIGNUP,
   CLEAR_STATE,
+  LOGOUT,
+  AUTHENTICATE_USER,
 } from "./actionTypes";
 
 import { APIUrls } from "../helper/urls";
@@ -100,5 +102,18 @@ export function signup(email, password, name, confirmPassword) {
         dispatch(signupfailed(data.message));
         return;
       });
+  };
+}
+
+export function logout() {
+  return {
+    type: LOGOUT,
+  };
+}
+
+export function authenticateUser({ name, id }) {
+  return {
+    type: AUTHENTICATE_USER,
+    user: { name, id },
   };
 }
