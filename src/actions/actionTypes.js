@@ -1,0 +1,10 @@
+// Auth
+export const START_LOGIN = "START_LOGIN";
+export const LOGIN_SUCCESSFULL = "LOGIN_SUCCESSFULL";
+export const LOGIN_FAILED = "LOGIN_FAILED";
+
+export const START_SIGNUP = "START_SIGN_UP";
+export const SIGNUP_SUCCESSFULL = "SIGN_UP_SUCCESSFULL";
+export const SIGNUP_FAILED = "SIGN_UP_FAILED";
+
+export const CLEAR_STATE = "CLEAR_STATE";
