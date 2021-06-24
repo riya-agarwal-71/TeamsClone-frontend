@@ -1,4 +1,4 @@
-const ROOT_API = `http://localhost:8000/api`;
+const ROOT_API = `https://teams-clone-71.herokuapp.com/api`;
 
 export const APIUrls = {
   login: () => `${ROOT_API}/users/login`,
