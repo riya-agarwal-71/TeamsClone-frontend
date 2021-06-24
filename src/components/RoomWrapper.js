@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { io } from "socket.io-client";
-import { Redirect } from "react-router";
+// import { Redirect } from "react-router";
 
 import { server_url } from "../helper/urls";
 import { AskBeforeEntering, Room } from ".";

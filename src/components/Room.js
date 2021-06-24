@@ -5,7 +5,7 @@ import {
   Mic,
   Videocam,
   Info,
-  Chat,
+  // Chat,
   FileCopy,
   MicOff,
   VideocamOff,
@@ -27,8 +27,8 @@ const Room = (props) => {
     micOn,
   } = props;
   return (
-    <div className="room-container">
-      <div id="main" className="video-components">
+    <div className='room-container'>
+      <div id='main' className='video-components'>
         <video
           data-socket={`${socketID}`}
           ref={myVideoRef}
@@ -40,17 +40,17 @@ const Room = (props) => {
         ></video>
       </div>
       <Toolbar
-        className="options-bar in-call"
+        className='options-bar in-call'
         style={{ background: "#5a5a5a" }}
       >
         <div>
-          <IconButton color="inherit" onClick={handleInfoModalOpen}>
+          <IconButton color='inherit' onClick={handleInfoModalOpen}>
             <Info />
           </IconButton>
           <Modal open={infoModalOpen} onClose={handleInfoModalClose}>
-            <div className="joining-info">
+            <div className='joining-info'>
               <h4>Copy Joining Info</h4>
-              <div className="joining-info-details">
+              <div className='joining-info-details'>
                 <div
                   style={{
                     borderBottom: "1px solid black",
@@ -59,11 +59,11 @@ const Room = (props) => {
                 >
                   URL
                 </div>
-                <div id="url" className="room-id">
+                <div id='url' className='room-id'>
                   {url}
                 </div>
                 <Button
-                  variant="outlined"
+                  variant='outlined'
                   startIcon={<FileCopy />}
                   onClick={copyJoiningInfo}
                 >
@@ -73,14 +73,14 @@ const Room = (props) => {
             </div>
           </Modal>
         </div>
-        <div className="call-options">
-          <IconButton color="inherit" onClick={toggleMicState}>
+        <div className='call-options'>
+          <IconButton color='inherit' onClick={toggleMicState}>
             {micOn ? <Mic /> : <MicOff />}
           </IconButton>
-          <IconButton color="inherit" onClick={endCall}>
+          <IconButton color='inherit' onClick={endCall}>
             <CallEnd />
           </IconButton>
-          <IconButton color="inherit" onClick={toggleCameraState}>
+          <IconButton color='inherit' onClick={toggleCameraState}>
             {videoOn ? <Videocam /> : <VideocamOff />}
           </IconButton>
         </div>
