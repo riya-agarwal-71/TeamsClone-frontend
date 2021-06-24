@@ -5,4 +5,4 @@ export const APIUrls = {
   signup: () => `${ROOT_API}/users/signup`,
 };
 
-export const server_url = "http://localhost:8000/";
+export const server_url = "https://teams-clone-71.herokuapp.com/";
