@@ -46,7 +46,7 @@ class RoomWrapper extends Component {
     var { width, height } = document
       .getElementById("main")
       .getBoundingClientRect();
-    var videos = [...document.getElementsByTagName("video")];
+    var videos = [...document.getElementsByClassName("video")];
     var max_height;
     var max_width;
     if (videos.length > 0) {
@@ -58,15 +58,20 @@ class RoomWrapper extends Component {
     if (videos.length > 1) {
       myVideo = videos[0];
       videos.splice(0, 1);
-      myVideo.height = 110;
-      myVideo.width = 170;
-      if (!this.state.videoOn) {
-        myVideo.style.display = "none";
-      }
+      var videoTag = myVideo.getElementsByTagName("video")[0];
+      console.log(videoTag);
+      videoTag.height = 110;
+      videoTag.width = 170;
+      var logo = myVideo.getElementsByClassName("logo")[0];
+      logo.style.width = 50 + "px";
+      logo.style.height = 50 + "px";
+      var heading = logo.getElementsByTagName("h1")[0];
+      heading.style.fontSize = "2rem";
+      myVideo.style.height = 110 + "px";
+      myVideo.style.width = 170 + "px";
       myVideo.style.position = "absolute";
       myVideo.style.top = 0;
       myVideo.style.right = 0;
-      myVideo.style.zIndex = 100;
     }
     if (videos.length <= 2) {
       max_height = height - 5;
@@ -88,8 +93,12 @@ class RoomWrapper extends Component {
       }
     }
     videos.forEach((video) => {
-      video.height = max_height;
-      video.width = max_width;
+      var videoTag = video.getElementsByTagName("video")[0];
+      console.log(videoTag);
+      videoTag.height = max_height;
+      videoTag.width = max_width;
+      video.style.height = max_height + "px";
+      video.style.width = max_width + "px";
     });
   };
 
@@ -212,9 +221,10 @@ class RoomWrapper extends Component {
     }
   };
 
-  userJoinedEventHandler = (id, clients) => {
+  userJoinedEventHandler = (id, usernames, clients) => {
     const self = this;
-    clients.forEach((socketid) => {
+    clients.forEach((socketid, ind) => {
+      var username = usernames[ind];
       self.connections[socketid] = new RTCPeerConnection(peerConfig);
       self.connections[socketid].onicecandidate = function (event) {
         if (event.candidate) {
@@ -225,54 +235,72 @@ class RoomWrapper extends Component {
         var searchVideo = document.querySelector(`[data-socket="${socketid}"]`);
         if (searchVideo === null || searchVideo === undefined) {
           var main = document.getElementById("main");
-          var VideoElement = document.createElement("video");
-          VideoElement.setAttribute("data-socket", socketid);
-          VideoElement.autoplay = true;
-          VideoElement.playsinline = true;
-          VideoElement.srcObject = event.streams[0];
+          var videoContainer = document.createElement("div");
+          videoContainer.setAttribute("data-socket", socketid);
+          videoContainer.setAttribute("class", "video");
+          var videoElement = document.createElement("video");
+          videoElement.autoplay = true;
+          videoElement.playsInline = true;
+          videoElement.srcObject = event.streams[0];
+          videoElement.setAttribute("class", "video-element-call");
+          videoContainer.append(videoElement);
+          var overlayUsername = document.createElement("div");
+          overlayUsername.setAttribute("class", "username-video");
+          var usernameHeading = document.createElement("h3");
+          usernameHeading.innerHTML = username.toUpperCase();
+          overlayUsername.append(usernameHeading);
+          videoContainer.append(overlayUsername);
+          var noVideoDiv = document.createElement("div");
+          var logoDiv = document.createElement("div");
+          logoDiv.setAttribute("class", "logo");
+          var usernameLetter = document.createElement("h1");
+          usernameLetter.innerHTML = username.toUpperCase().substr(0, 1);
+          logoDiv.append(usernameLetter);
+          noVideoDiv.append(logoDiv);
+          videoContainer.append(noVideoDiv);
           if (event.streams[0].getVideoTracks().length <= 0) {
-            VideoElement.setAttribute("class", "video-element-call no-video");
+            noVideoDiv.setAttribute("class", "no-video-container");
           } else {
-            VideoElement.setAttribute("class", "video-element-call");
+            noVideoDiv.setAttribute("class", "dont-show");
           }
-          main.append(VideoElement);
+          main.append(videoContainer);
         } else {
-          searchVideo.srcObject = event.streams[0];
+          var vid = searchVideo.getElementsByTagName("video")[0];
+          vid.srcObject = event.streams[0];
+          var noVidDiv = searchVideo.children[searchVideo.children.length - 1];
           if (event.streams[0].getVideoTracks().length <= 0) {
-            searchVideo.setAttribute("class", "no-video video-element-call");
+            noVidDiv.setAttribute("class", "no-video-container");
           } else {
-            searchVideo.setAttribute("class", "video-element-call");
+            noVidDiv.setAttribute("class", "dont-show");
           }
         }
         self.getCssStyleForVideos();
       };
+      if (id === self.socketID) return;
       if (window.myStream !== undefined && window.myStream !== null) {
+        // console.log("SENT", window.myStream.getTracks(), " to ", socketid);
         window.myStream.getTracks().forEach((track) => {
           self.connections[socketid].addTrack(track, window.myStream);
         });
       } else {
+        // console.log("SENT EMPTY", window.myStream.id, " to ", socketid);
         window.myStream = self.silence();
         window.myStream.getTracks().forEach((track) => {
           self.connections[socketid].addTrack(track, window.myStream);
         });
       }
     });
-    if (id === self.socketID) {
-      self.sendStreamToPeer(window.stream);
-      self.getCssStyleForVideos();
-    }
+    if (id === self.socketID) self.sendStreamToPeer(window.myStream);
   };
 
   connectToSocket = () => {
     const socket = io(server_url);
-    console.log(server_url);
     const self = this;
     this.socket = socket;
-    console.log("username", this.username);
     socket.on("connect", () => {
       self.socketID = socket.id;
       self.getMediaDevicesFromNavigator();
-      socket.emit("join-call", window.location.href);
+      socket.emit("join-call", window.location.href, self.username);
     });
 
     socket.on("set-description", this.changeDescriptionEventHandler);
@@ -324,6 +352,7 @@ class RoomWrapper extends Component {
     this.setState({ isAccepted: true });
     this.getCallMedia();
     this.connectToSocket();
+    this.getCssStyleForVideos();
   };
 
   toggleMicState = async () => {
@@ -422,6 +451,7 @@ class RoomWrapper extends Component {
             toggleCameraState={this.toggleCameraState}
             micOn={this.state.micOn}
             loading={this.state.loading}
+            username={this.username}
           />
         ) : (
           <AskBeforeEntering

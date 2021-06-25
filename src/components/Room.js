@@ -25,19 +25,27 @@ const Room = (props) => {
     endCall,
     toggleCameraState,
     micOn,
+    username,
   } = props;
   return (
     <div className='room-container'>
       <div id='main' className='video-components'>
-        <video
-          data-socket={`${socketID}`}
-          ref={myVideoRef}
-          autoPlay
-          muted
-          className={
-            videoOn ? "video-element-call" : "video-element-call no-video"
-          }
-        ></video>
+        <div className='video' data-socket={`${socketID}`}>
+          <video
+            ref={myVideoRef}
+            autoPlay
+            muted
+            className='video-element-call'
+          ></video>
+          <div className='username-video'>
+            <h3>ME</h3>
+          </div>
+          <div className={videoOn ? "dont-show" : "no-video-container"}>
+            <div className='logo'>
+              <h1>{username.toUpperCase().substr(0, 1)}</h1>
+            </div>
+          </div>
+        </div>
       </div>
       <Toolbar
         className='options-bar in-call'
