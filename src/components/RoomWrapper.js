@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { io } from "socket.io-client";
+import { connect } from "react-redux";
 // import { Redirect } from "react-router";
 
 import { server_url } from "../helper/urls";
@@ -13,6 +14,7 @@ const peerConfig = {
 class RoomWrapper extends Component {
   constructor(props) {
     super(props);
+    this.username = "";
     this.myVideoRef = React.createRef();
     this.videoAvailable = false;
     this.audioAvailable = false;
@@ -33,6 +35,11 @@ class RoomWrapper extends Component {
     this.roomID = this.roomID[this.roomID.length - 1];
 
     this.getUserPermissions();
+    if (localStorage.token) {
+      this.username = this.props.auth.user.name;
+    } else {
+      this.username = this.props.guest.username;
+    }
   }
 
   getCssStyleForVideos = () => {
@@ -261,6 +268,7 @@ class RoomWrapper extends Component {
     console.log(server_url);
     const self = this;
     this.socket = socket;
+    console.log("username", this.username);
     socket.on("connect", () => {
       self.socketID = socket.id;
       self.getMediaDevicesFromNavigator();
@@ -431,4 +439,11 @@ class RoomWrapper extends Component {
   }
 }
 
-export default RoomWrapper;
+function mapStateToProps(state) {
+  return {
+    auth: state.auth,
+    guest: state.guest,
+  };
+}
+
+export default connect(mapStateToProps)(RoomWrapper);

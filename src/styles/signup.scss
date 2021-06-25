@@ -1,10 +1,10 @@
 .main-container {
-  width: 100vw;
   height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  margin: 0 1rem 0 1rem;
 }
 
 .alert {
@@ -16,8 +16,10 @@
   display: flex;
   flex-direction: column;
   align-content: center;
-  justify-content: center;
+  justify-content: space-around;
   padding: 1.5rem 5rem 2rem 5rem;
+  margin-bottom: 1rem;
+  height: 20rem;
 }
 
 .inputField {
@@ -50,4 +52,19 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
+}
+
+.root-contaniner {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.or-container {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-direction: row;
+  margin: 1rem;
 }

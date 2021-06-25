@@ -12,3 +12,6 @@ export const CLEAR_STATE = "CLEAR_STATE";
 export const LOGOUT = "LOGOUT";
 
 export const AUTHENTICATE_USER = "AUTHENTICATE_USER";
+
+// Guest
+export const GUEST_LOGIN = "GUEST_LOGIN";

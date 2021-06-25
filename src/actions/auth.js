@@ -111,9 +111,9 @@ export function logout() {
   };
 }
 
-export function authenticateUser({ name, id }) {
+export function authenticateUser(user) {
   return {
     type: AUTHENTICATE_USER,
-    user: { name, id },
+    user,
   };
 }

@@ -6,13 +6,6 @@ import { Navbar } from "./";
 import "../styles/home.scss";
 
 class Home extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      roomUrl: "",
-    };
-  }
-
   createNewRoom = () => {
     const newRoomUrl =
       randstr({ length: 5, type: "alphanumeric" }) +
@@ -37,11 +30,11 @@ class Home extends Component {
     return (
       <div>
         <Navbar />
-        <div className="home-container">
+        <div className='home-container'>
           <div>
             <Button
-              className="btn-margin"
-              variant="outlined"
+              className='btn-margin'
+              variant='outlined'
               onClick={this.createNewRoom}
             >
               Create a Room
@@ -50,12 +43,12 @@ class Home extends Component {
           OR
           <div>
             <InputBase
-              placeholder="Enter the room id"
+              placeholder='Enter the room id'
               onChange={this.handleRoomIdChange}
             />
             <Button
-              className="btn-margin"
-              variant="outlined"
+              className='btn-margin'
+              variant='outlined'
               onClick={this.redirectToRoom}
             >
               Join an existing room

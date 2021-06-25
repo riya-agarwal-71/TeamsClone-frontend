@@ -6,39 +6,44 @@ import {
   Route,
   Redirect,
 } from "react-router-dom";
-import jwt_decode from "jwt-decode";
-import { authenticateUser } from "../actions/auth";
 
 import "../styles/index.scss";
 import { Home, Login, SignUp, RoomWrapper, Page404 } from "./";
 
-const PrivateRoute = (props) => {
-  const { isLoggedIn, path, component: Component } = props;
+const PrivateRoute = (privateProps) => {
+  const { isLoggedIn, location, component: Component } = privateProps;
+  const path = location.pathname;
+  console.log("isLoggedIn", isLoggedIn);
+  console.log(path);
   if (isLoggedIn) {
     return <Route path={path} render={(props) => <Component {...props} />} />;
   }
-  return <Redirect to={{ pathname: "/login", state: { from: props.path } }} />;
+  return (
+    <Redirect
+      to={{
+        pathname: "/login",
+        state: { from: privateProps.location.pathname },
+      }}
+    />
+  );
 };
 
 class App extends Component {
-  componentDidMount = () => {
-    if (localStorage.token) {
-      var { id, name } = jwt_decode(localStorage.token);
-      this.props.dispatch(authenticateUser({ id, name }));
-    }
-  };
   render() {
+    console.log("APP RENDER", this.props.auth.isLoggedIn);
     return (
       <div>
         <Router>
           <Switch>
-            <Route path='/' exact component={Home} />
+            <Route exact path='/' component={Home} />
             <Route path='/login' component={Login} />
             <Route path='/signup' component={SignUp} />
             <PrivateRoute
               path='/room/:id'
               component={RoomWrapper}
-              isLoggedIn={localStorage.token}
+              isLoggedIn={
+                this.props.auth.isLoggedIn || this.props.guest.isLoggedIn
+              }
             />
             <Route component={Page404} />
           </Switch>
@@ -51,6 +56,7 @@ class App extends Component {
 function mapStateToProps(state) {
   return {
     auth: state.auth,
+    guest: state.guest,
   };
 }
 

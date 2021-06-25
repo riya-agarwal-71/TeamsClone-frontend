@@ -14,6 +14,7 @@ import { Visibility, VisibilityOff } from "@material-ui/icons";
 import { startLogin, login, clearAuthState } from "../actions/auth";
 
 import "../styles/signup.scss";
+import { guestLogin } from "../actions/guest";
 
 class Login extends Component {
   constructor(props) {
@@ -23,6 +24,8 @@ class Login extends Component {
       password: "",
       redirect: false,
       passwordVisible: false,
+      username: "",
+      redirectGuest: false,
     };
   }
 
@@ -64,83 +67,138 @@ class Login extends Component {
     });
   };
 
+  handleGuestFormSubmit = (e) => {
+    e.preventDefault();
+    var guestUsername = this.state.username;
+    guestUsername = guestUsername + " (Guest)";
+    console.log(guestUsername);
+    console.log(this.props.location.state.from);
+    this.props.dispatch(guestLogin(guestUsername));
+    this.setState({
+      redirectGuest: true,
+    });
+  };
+
+  handleGuestNameChange = (e) => {
+    this.setState({
+      username: e.target.value,
+    });
+  };
+
   render() {
     if (this.state.redirect) {
-      return <Redirect to='/' />;
+      if (this.props.location.state) {
+        return <Redirect to={this.props.location.state.from} />;
+      }
+      return <Redirect to={"/"} />;
+    }
+    if (this.state.redirectGuest) {
+      return <Redirect to={this.props.location.state.from} />;
     }
     return (
-      <div className='main-container'>
-        {this.props.auth.success && (
-          <div>
-            <Alert key={0} severity={"success"} classes={{ root: "alert" }}>
-              {this.props.auth.success}
+      <div className='root-contaniner'>
+        <div className='main-container'>
+          {this.props.auth.success && (
+            <div>
+              <Alert key={0} severity={"success"} classes={{ root: "alert" }}>
+                {this.props.auth.success}
+              </Alert>
+            </div>
+          )}
+          {this.props.auth.success ? this.redirectToHome() : ""}
+          {this.props.auth.error && (
+            <Alert key={0} severity={"error"} classes={{ root: "alert" }}>
+              {this.props.auth.error}
             </Alert>
+          )}
+          <form onSubmit={this.handleFormSubmit}>
+            <Paper className='form'>
+              <div className='heading'>
+                <Typography variant='h4'>Login</Typography>
+              </div>
+              <div className='inputField'>
+                <TextField
+                  placeholder='Email'
+                  required
+                  type='email'
+                  margin='none'
+                  onChange={this.handleEmailChange}
+                />
+              </div>
+              <div className='inputField'>
+                <TextField
+                  placeholder='Password'
+                  required
+                  type='password'
+                  margin='none'
+                  onChange={this.handlePasswordChange}
+                  InputProps={{
+                    endAdornment: (
+                      <IconButton
+                        size='small'
+                        onClick={this.handlePasswordVisibilty}
+                      >
+                        {this.state.passwordVisible ? (
+                          <Visibility fontSize='small' />
+                        ) : (
+                          <VisibilityOff fontSize='small' />
+                        )}
+                      </IconButton>
+                    ),
+                  }}
+                />
+              </div>
+              <div className='submit-btn'>
+                <Button
+                  className='btn'
+                  type='submit'
+                  disabled={this.props.auth.inProgress}
+                >
+                  Login
+                </Button>
+              </div>
+              <Typography variant='subtitle2' className='subtitle'>
+                <div>Dont have an account ? </div>
+                <div>
+                  <Link href='/signup' className='login-link'>
+                    Sign up
+                  </Link>{" "}
+                  for one now !!
+                </div>
+              </Typography>
+            </Paper>
+          </form>
+        </div>
+        {this.props.location.state && (
+          <div className='or-container'>
+            <Typography variant='h6'>OR</Typography>
           </div>
         )}
-        {this.props.auth.success ? this.redirectToHome() : ""}
-        {this.props.auth.error && (
-          <Alert key={0} severity={"error"} classes={{ root: "alert" }}>
-            {this.props.auth.error}
-          </Alert>
+        {this.props.location.state && (
+          <div className='main-container'>
+            <form onSubmit={this.handleGuestFormSubmit}>
+              <Paper className='form'>
+                <div className='heading'>
+                  <Typography variant='h4'>Continue as Guest</Typography>
+                </div>
+                <div className='inputField'>
+                  <TextField
+                    placeholder='Name'
+                    type='text'
+                    required
+                    fullWidth
+                    onChange={this.handleGuestNameChange}
+                  />
+                </div>
+                <div className='submit-btn'>
+                  <Button type='submit' className='btn'>
+                    Continue
+                  </Button>
+                </div>
+              </Paper>
+            </form>
+          </div>
         )}
-        <form onSubmit={this.handleFormSubmit}>
-          <Paper className='form'>
-            <div className='heading'>
-              <Typography variant='h4'>Login</Typography>
-            </div>
-            <div className='inputField'>
-              <TextField
-                placeholder='Email'
-                required
-                type='email'
-                margin='none'
-                onChange={this.handleEmailChange}
-              />
-            </div>
-            <div className='inputField'>
-              <TextField
-                placeholder='Password'
-                required
-                type='password'
-                margin='none'
-                onChange={this.handlePasswordChange}
-                InputProps={{
-                  endAdornment: (
-                    <IconButton
-                      size='small'
-                      onClick={this.handlePasswordVisibilty}
-                    >
-                      {this.state.passwordVisible ? (
-                        <Visibility fontSize='small' />
-                      ) : (
-                        <VisibilityOff fontSize='small' />
-                      )}
-                    </IconButton>
-                  ),
-                }}
-              />
-            </div>
-            <div className='submit-btn'>
-              <Button
-                className='btn'
-                type='submit'
-                disabled={this.props.auth.inProgress}
-              >
-                Login
-              </Button>
-            </div>
-            <Typography variant='subtitle2' className='subtitle'>
-              <div>Dont have an account ? </div>
-              <div>
-                <Link href='/signup' className='login-link'>
-                  Sign up
-                </Link>{" "}
-                for one now !!
-              </div>
-            </Typography>
-          </Paper>
-        </form>
-        {this.props.location.state && <div>Continue As guest ?</div>}
       </div>
     );
   }
