@@ -72,6 +72,7 @@ class RoomWrapper extends Component {
       myVideo.style.position = "absolute";
       myVideo.style.top = 0;
       myVideo.style.right = 0;
+      myVideo.style.zIndex = 5;
     }
     if (videos.length <= 2) {
       max_height = height - 5;
@@ -352,7 +353,6 @@ class RoomWrapper extends Component {
     this.setState({ isAccepted: true });
     this.getCallMedia();
     this.connectToSocket();
-    this.getCssStyleForVideos();
   };
 
   toggleMicState = async () => {
