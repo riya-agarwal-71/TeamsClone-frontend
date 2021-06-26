@@ -78,12 +78,12 @@ class Signup extends Component {
   };
 
   redirectToLogin = () => {
-    this.props.dispatch(clearAuthState());
     setTimeout(() => {
       this.setState({
         redirect: true,
       });
     }, 500);
+    this.props.dispatch(clearAuthState());
   };
 
   render() {
