@@ -169,12 +169,12 @@ class Login extends Component {
             </Paper>
           </form>
         </div>
-        {this.props.location.state && (
+        {this.props.location.state && !this.props.location.state.isNew && (
           <div className='or-container'>
             <Typography variant='h6'>OR</Typography>
           </div>
         )}
-        {this.props.location.state && (
+        {this.props.location.state && !this.props.location.state.isNew && (
           <div className='main-container'>
             <form onSubmit={this.handleGuestFormSubmit}>
               <Paper className='form'>

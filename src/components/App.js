@@ -13,19 +13,27 @@ import { Home, Login, SignUp, RoomWrapper, Page404 } from "./";
 const PrivateRoute = (privateProps) => {
   const { isLoggedIn, location, component: Component } = privateProps;
   const path = location.pathname;
-  console.log("isLoggedIn", isLoggedIn);
-  console.log(path);
+  console.log(privateProps);
   if (isLoggedIn) {
     return <Route path={path} render={(props) => <Component {...props} />} />;
   }
-  return (
-    <Redirect
-      to={{
-        pathname: "/login",
-        state: { from: privateProps.location.pathname },
-      }}
-    />
-  );
+  var isNew = false;
+  if (location.state) {
+    isNew = location.state.isNew;
+  }
+  if (path.substr(0, 5) === `/room`) {
+    return (
+      <Redirect
+        to={{
+          pathname: "/login",
+          state: {
+            from: privateProps.location.pathname,
+            isNew,
+          },
+        }}
+      />
+    );
+  }
 };
 
 class App extends Component {
