@@ -59,7 +59,6 @@ class RoomWrapper extends Component {
       myVideo = videos[0];
       videos.splice(0, 1);
       var videoTag = myVideo.getElementsByTagName("video")[0];
-      console.log(videoTag);
       videoTag.height = 110;
       videoTag.width = 170;
       var logo = myVideo.getElementsByClassName("logo")[0];
@@ -95,7 +94,6 @@ class RoomWrapper extends Component {
     }
     videos.forEach((video) => {
       var videoTag = video.getElementsByTagName("video")[0];
-      console.log(videoTag);
       videoTag.height = max_height;
       videoTag.width = max_width;
       video.style.height = max_height + "px";
@@ -438,6 +436,7 @@ class RoomWrapper extends Component {
       <div>
         {this.state.isAccepted ? (
           <Room
+            socket={this.socket}
             socketID={this.socketID}
             myVideoRef={this.myVideoRef}
             videoOn={this.state.videoOn}
@@ -452,6 +451,7 @@ class RoomWrapper extends Component {
             micOn={this.state.micOn}
             loading={this.state.loading}
             username={this.username}
+            getCssStyleForVideos={this.getCssStyleForVideos}
           />
         ) : (
           <AskBeforeEntering

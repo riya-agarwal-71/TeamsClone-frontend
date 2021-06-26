@@ -7,6 +7,7 @@ import RoomWrapper from "./RoomWrapper";
 import Page404 from "./Page404";
 import AskBeforeEntering from "./AskBeforeEntering";
 import Room from "./Room";
+import ChatBox from "./ChatBox";
 
 export {
   App,
@@ -18,4 +19,5 @@ export {
   Page404,
   AskBeforeEntering,
   Room,
+  ChatBox,
 };

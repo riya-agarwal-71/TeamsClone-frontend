@@ -119,7 +119,7 @@ class Login extends Component {
               </div>
               <div className='inputField'>
                 <TextField
-                  placeholder='Email'
+                  label='Email'
                   required
                   type='email'
                   margin='none'
@@ -128,7 +128,7 @@ class Login extends Component {
               </div>
               <div className='inputField'>
                 <TextField
-                  placeholder='Password'
+                  label='Password'
                   required
                   type={this.state.passwordVisible ? "text" : "password"}
                   margin='none'

@@ -110,13 +110,13 @@ class Signup extends Component {
           </Alert>
         )}
         <form onSubmit={this.handleFormSubmit}>
-          <Paper className='form'>
+          <Paper className='form signup'>
             <div className='heading'>
               <Typography variant='h4'>Sign Up</Typography>
             </div>
             <div className='inputField'>
               <TextField
-                placeholder='Email'
+                label='Email'
                 required
                 type='email'
                 margin='none'
@@ -126,7 +126,7 @@ class Signup extends Component {
             </div>
             <div className='inputField'>
               <TextField
-                placeholder='Name'
+                label='Name'
                 required
                 margin='none'
                 onChange={this.handleNameChange}
@@ -135,7 +135,7 @@ class Signup extends Component {
             </div>
             <div className='inputField'>
               <TextField
-                placeholder='Password'
+                label='Password'
                 required
                 type={this.state.passVisible ? "text" : "password"}
                 margin='none'
@@ -156,7 +156,7 @@ class Signup extends Component {
             </div>
             <div className='inputField'>
               <TextField
-                placeholder='Confirm Password'
+                label='Confirm Password'
                 required
                 type={this.state.confirmPassVisible ? "text" : "password"}
                 margin='none'
