@@ -29,7 +29,7 @@ class Login extends Component {
     };
   }
 
-  componentWillUnmount = () => {
+  componentDidMount = () => {
     this.props.dispatch(clearAuthState());
   };
 
@@ -53,11 +53,13 @@ class Login extends Component {
   };
 
   redirectToHome = () => {
-    setTimeout(() => {
-      this.setState({
-        redirect: true,
-      });
-    }, 500);
+    if (this.props.auth.success != null) {
+      setTimeout(() => {
+        this.setState({
+          redirect: true,
+        });
+      }, 500);
+    }
   };
 
   handlePasswordVisibilty = () => {
@@ -91,8 +93,7 @@ class Login extends Component {
         return <Redirect to={this.props.location.state.from} />;
       }
       return <Redirect to={"/"} />;
-    }
-    if (this.state.redirectGuest) {
+    } else if (this.state.redirectGuest) {
       return <Redirect to={this.props.location.state.from} />;
     }
     return (
@@ -105,7 +106,7 @@ class Login extends Component {
               </Alert>
             </div>
           )}
-          {this.props.auth.success ? this.redirectToHome() : ""}
+          {this.redirectToHome()}
           {this.props.auth.error && (
             <Alert key={0} severity={"error"} classes={{ root: "alert" }}>
               {this.props.auth.error}
@@ -129,7 +130,7 @@ class Login extends Component {
                 <TextField
                   placeholder='Password'
                   required
-                  type='password'
+                  type={this.state.passwordVisible ? "text" : "password"}
                   margin='none'
                   onChange={this.handlePasswordChange}
                   InputProps={{

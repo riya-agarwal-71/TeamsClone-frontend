@@ -78,6 +78,7 @@ class Signup extends Component {
   };
 
   redirectToLogin = () => {
+    this.props.dispatch(clearAuthState());
     setTimeout(() => {
       this.setState({
         redirect: true,
@@ -87,10 +88,14 @@ class Signup extends Component {
 
   render() {
     if (this.state.redirect) {
-      return <Redirect to="/login" />;
+      return (
+        <Redirect
+          to={{ pathname: "/login", state: { from: "/", isNew: true } }}
+        />
+      );
     }
     return (
-      <div className="main-container">
+      <div className='main-container'>
         {this.props.auth.success && (
           <div>
             <Alert key={0} severity={"success"} classes={{ root: "alert" }}>
@@ -105,87 +110,87 @@ class Signup extends Component {
           </Alert>
         )}
         <form onSubmit={this.handleFormSubmit}>
-          <Paper className="form">
-            <div className="heading">
-              <Typography variant="h4">Sign Up</Typography>
+          <Paper className='form'>
+            <div className='heading'>
+              <Typography variant='h4'>Sign Up</Typography>
             </div>
-            <div className="inputField">
+            <div className='inputField'>
               <TextField
-                placeholder="Email"
+                placeholder='Email'
                 required
-                type="email"
-                margin="none"
+                type='email'
+                margin='none'
                 onChange={this.handleEmailChange}
                 value={this.state.email}
               />
             </div>
-            <div className="inputField">
+            <div className='inputField'>
               <TextField
-                placeholder="Name"
+                placeholder='Name'
                 required
-                margin="none"
+                margin='none'
                 onChange={this.handleNameChange}
                 value={this.state.name}
               />
             </div>
-            <div className="inputField">
+            <div className='inputField'>
               <TextField
-                placeholder="Password"
+                placeholder='Password'
                 required
                 type={this.state.passVisible ? "text" : "password"}
-                margin="none"
+                margin='none'
                 onChange={this.handlePassChange}
                 value={this.state.password}
                 InputProps={{
                   endAdornment: (
-                    <IconButton size="small" onClick={this.handlePassVisibilty}>
+                    <IconButton size='small' onClick={this.handlePassVisibilty}>
                       {this.state.passVisible ? (
-                        <Visibility fontSize="small" />
+                        <Visibility fontSize='small' />
                       ) : (
-                        <VisibilityOff fontSize="small" />
+                        <VisibilityOff fontSize='small' />
                       )}
                     </IconButton>
                   ),
                 }}
               />
             </div>
-            <div className="inputField">
+            <div className='inputField'>
               <TextField
-                placeholder="Confirm Password"
+                placeholder='Confirm Password'
                 required
                 type={this.state.confirmPassVisible ? "text" : "password"}
-                margin="none"
+                margin='none'
                 onChange={this.handleConfirmPassChange}
                 value={this.state.confirmPassword}
                 InputProps={{
                   endAdornment: (
                     <IconButton
-                      size="small"
+                      size='small'
                       onClick={this.handleconfirmPassVisiblity}
                     >
                       {this.state.confirmPassVisible ? (
-                        <Visibility fontSize="small" />
+                        <Visibility fontSize='small' />
                       ) : (
-                        <VisibilityOff fontSize="small" />
+                        <VisibilityOff fontSize='small' />
                       )}
                     </IconButton>
                   ),
                 }}
               />
             </div>
-            <div className="submit-btn">
+            <div className='submit-btn'>
               <Button
-                className="btn"
-                type="submit"
+                className='btn'
+                type='submit'
                 disabled={this.props.auth.inProgress}
               >
                 Sign Up
               </Button>
             </div>
-            <Typography variant="subtitle2" className="subtitle">
+            <Typography variant='subtitle2' className='subtitle'>
               <div>Already have an account ? </div>
               <div>
-                <Link href="/login" className="login-link">
+                <Link href='/login' className='login-link'>
                   Login
                 </Link>{" "}
                 instead ...

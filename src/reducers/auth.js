@@ -55,6 +55,10 @@ export default function auth(state = initialState, action) {
       return {
         ...state,
         error: null,
+        success: null,
+        isLoggedIn: false,
+        inProgress: false,
+        user: {},
       };
     case AUTHENTICATE_USER:
       return {

@@ -13,7 +13,6 @@ import { Home, Login, SignUp, RoomWrapper, Page404 } from "./";
 const PrivateRoute = (privateProps) => {
   const { isLoggedIn, location, component: Component } = privateProps;
   const path = location.pathname;
-  console.log(privateProps);
   if (isLoggedIn) {
     return <Route path={path} render={(props) => <Component {...props} />} />;
   }
@@ -38,7 +37,6 @@ const PrivateRoute = (privateProps) => {
 
 class App extends Component {
   render() {
-    console.log("APP RENDER", this.props.auth.isLoggedIn);
     return (
       <div>
         <Router>
