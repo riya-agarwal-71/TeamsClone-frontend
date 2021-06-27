@@ -1,11 +1,12 @@
 import React, { Component } from "react";
 import { io } from "socket.io-client";
 import { connect } from "react-redux";
-// import { Redirect } from "react-router";
+import { Redirect } from "react-router";
 
 import { server_url } from "../helper/urls";
 import { AskBeforeEntering, Room } from ".";
 import "../styles/room.scss";
+import { checkExistingRoom } from "../actions/room";
 
 const peerConfig = {
   iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
@@ -28,6 +29,7 @@ class RoomWrapper extends Component {
       videoOn: false,
       micOn: false,
       loading: true,
+      roomExist: true,
     };
 
     this.url = window.location.href;
@@ -40,7 +42,23 @@ class RoomWrapper extends Component {
     } else {
       this.username = this.props.guest.username;
     }
+    this.checkIfRoomExists();
   }
+
+  checkIfRoomExists = () => {
+    let url = window.location.href;
+    let roomCode = url.split("/");
+    roomCode = roomCode[roomCode.length - 1];
+    const self = this;
+    this.props.dispatch(checkExistingRoom(roomCode)).then(() => {
+      if (!self.props.room.success) {
+        console.log("Room Does not exist");
+        self.setState({
+          roomExist: false,
+        });
+      }
+    });
+  };
 
   getCssStyleForVideos = () => {
     var { width, height } = document
@@ -432,6 +450,9 @@ class RoomWrapper extends Component {
   };
 
   render() {
+    if (!this.state.roomExist) {
+      return <Redirect to={"/"} />;
+    }
     return (
       <div>
         {this.state.isAccepted ? (
@@ -473,6 +494,7 @@ function mapStateToProps(state) {
   return {
     auth: state.auth,
     guest: state.guest,
+    room: state.room,
   };
 }
 

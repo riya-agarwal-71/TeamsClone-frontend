@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { IconButton, TextField } from "@material-ui/core";
-import { ScreenLockLandscapeTwoTone, Send } from "@material-ui/icons";
+import { Send } from "@material-ui/icons";
 
 import "../styles/chatbox.scss";
 
@@ -20,7 +20,6 @@ class ChatBox extends Component {
   };
 
   gotMessageEventHandler = (message, username, fromSocketID) => {
-    console.log("got message from", username);
     var messageContainer = document.createElement("div");
     messageContainer.setAttribute("class", "message");
     var userContainer = document.createElement("div");

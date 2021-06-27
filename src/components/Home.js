@@ -3,7 +3,9 @@ import { Button, InputBase } from "@material-ui/core";
 import randstr from "crypto-random-string";
 import { Navbar } from "./";
 import { Redirect } from "react-router-dom";
+import { connect } from "react-redux";
 
+import { startRoom, createRoom, checkExistingRoom } from "../actions/room";
 import "../styles/home.scss";
 
 class Home extends Component {
@@ -20,12 +22,22 @@ class Home extends Component {
     const newRoomUrl =
       randstr({ length: 5, type: "alphanumeric" }) +
       "-" +
+      randstr({ length: 5, type: "alphanumeric" }) +
+      "-" +
       randstr({ length: 5, type: "alphanumeric" });
-    this.setState({
-      redirectNewRoom: true,
-      roomCode: newRoomUrl,
+
+    const self = this;
+    this.props.dispatch(startRoom());
+    this.props.dispatch(createRoom(newRoomUrl)).then(() => {
+      if (self.props.room.success) {
+        self.setState({
+          redirectNewRoom: true,
+          roomCode: newRoomUrl,
+        });
+      } else {
+        console.log(self.props.room.error);
+      }
     });
-    // window.location.href = `room/${newRoomUrl}`;
   };
 
   handleRoomIdChange = (e) => {
@@ -37,11 +49,18 @@ class Home extends Component {
   redirectToRoom = () => {
     let roomCode = this.state.roomUrl.split("/");
     roomCode = roomCode[roomCode.length - 1];
-    this.setState({
-      redirectExistingRoom: true,
-      roomCode: roomCode,
+    const self = this;
+    this.props.dispatch(startRoom());
+    this.props.dispatch(checkExistingRoom(roomCode)).then(() => {
+      if (self.props.room.success) {
+        self.setState({
+          redirectExistingRoom: true,
+          roomCode: roomCode,
+        });
+      } else {
+        console.log(self.props.room.error);
+      }
     });
-    // window.location.href = `room/${roomCode}`;
   };
 
   render() {
@@ -55,7 +74,7 @@ class Home extends Component {
         />
       );
     }
-    if (this.state.redirectToRoom && this.state.roomCode) {
+    if (this.state.redirectExistingRoom && this.state.roomCode) {
       return (
         <Redirect
           to={{
@@ -98,4 +117,10 @@ class Home extends Component {
   }
 }
 
-export default Home;
+function mapStateToProps(state) {
+  return {
+    room: state.room,
+  };
+}
+
+export default connect(mapStateToProps)(Home);

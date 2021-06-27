@@ -15,3 +15,9 @@ export const AUTHENTICATE_USER = "AUTHENTICATE_USER";
 
 // Guest
 export const GUEST_LOGIN = "GUEST_LOGIN";
+
+// Room
+export const START_ROOM = "START_ROOM";
+export const ROOM_SUCCESSFULL = "ROOM_SUCCESSFULL";
+export const ROOM_FAILED = "ROOM_FAILED";
+export const CLEAR_ROOM = "CLEAR_ROOM";

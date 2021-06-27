@@ -41,7 +41,7 @@ export function clearAuthState() {
 }
 
 export function login(email, password) {
-  return (dispatch) => {
+  return (dispatch, done) => {
     const url = APIUrls.login();
     fetch(url, {
       method: "POST",
@@ -55,9 +55,11 @@ export function login(email, password) {
         if (data.success === true) {
           localStorage.setItem("token", data.data.token);
           dispatch(loginSuccess(data.data.user, data.message));
+          done();
           return;
         }
         dispatch(loginfailed(data.message));
+        done();
         return;
       });
   };
@@ -84,7 +86,7 @@ export function signupfailed(error) {
 }
 
 export function signup(email, password, name, confirmPassword) {
-  return (dispatch) => {
+  return (dispatch, done) => {
     const url = APIUrls.signup();
     fetch(url, {
       method: "POST",
@@ -97,9 +99,11 @@ export function signup(email, password, name, confirmPassword) {
       .then(({ data }) => {
         if (data.success === true) {
           dispatch(signupSuccess(data.message));
+          done();
           return;
         }
         dispatch(signupfailed(data.message));
+        done();
         return;
       });
   };

@@ -10,7 +10,6 @@ class AppWrapper extends Component {
     super(props);
     if (localStorage.getItem("token")) {
       var user = jwt_decode(localStorage.getItem("token"));
-      console.log(user);
       this.props.dispatch(
         authenticateUser({ name: user.name, email: user.email })
       );
