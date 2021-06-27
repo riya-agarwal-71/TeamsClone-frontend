@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { IconButton, TextField } from "@material-ui/core";
 import { Send } from "@material-ui/icons";
+import { connect } from "react-redux";
 
 import "../styles/chatbox.scss";
 
@@ -48,43 +49,57 @@ class ChatBox extends Component {
   sendMessage = (e) => {
     e.preventDefault();
     var message = this.state.text;
-    if (message !== "") {
+    if (message.trim() !== "") {
       this.setState({
         text: "",
       });
+      this.props.socket.emit(
+        "message",
+        message,
+        window.location.href,
+        this.props.username,
+        this.props.socket.id
+      );
     }
-    this.props.socket.emit(
-      "message",
-      message,
-      window.location.href,
-      this.props.username,
-      this.props.socket.id
-    );
   };
 
   render() {
     return (
       <div className='chatbox'>
         <div id='chatbox-messages' className='messages-container'></div>
-        <form className='send-text-form' onSubmit={this.sendMessage}>
-          <div className='textbox'>
-            <TextField
-              classes={{ root: "message-input" }}
-              placeholder='Start typing...'
-              multiline
-              rowsMax={3}
-              fullWidth
-              onChange={this.handleTextChange}
-              value={this.state.text}
-            />
+        {this.props.guest.isLoggedIn ? (
+          <div className='send-text-form'>
+            <div className='guest-chatbox'>
+              Please login to send messages...
+            </div>
           </div>
-          <IconButton type='submit'>
-            <Send fontSize='small' />
-          </IconButton>
-        </form>
+        ) : (
+          <form className='send-text-form' onSubmit={this.sendMessage}>
+            <div className='textbox'>
+              <TextField
+                classes={{ root: "message-input" }}
+                placeholder='Start typing...'
+                multiline
+                rowsMax={3}
+                fullWidth
+                onChange={this.handleTextChange}
+                value={this.state.text}
+              />
+            </div>
+            <IconButton type='submit'>
+              <Send fontSize='small' />
+            </IconButton>
+          </form>
+        )}
       </div>
     );
   }
 }
 
-export default ChatBox;
+function mapStateToProps(state) {
+  return {
+    guest: state.guest,
+  };
+}
+
+export default connect(mapStateToProps)(ChatBox);

@@ -74,25 +74,3 @@ export function checkExistingRoom(roomUrl) {
       });
   };
 }
-
-export function deleteRoom(roomUrl) {
-  return (dispatch) => {
-    const url = APIUrls.deleteRoom();
-    return fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: getFormBody({ roomUrl }),
-    })
-      .then((response) => response.json())
-      .then(({ data }) => {
-        if (data.success === true) {
-          dispatch(roomSuccessfull(data.data.url));
-          dispatch(clearRoom());
-        } else {
-          dispatch(roomFailed(data.message));
-        }
-      });
-  };
-}
