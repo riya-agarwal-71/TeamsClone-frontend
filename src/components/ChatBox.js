@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { IconButton, TextField } from "@material-ui/core";
+import { IconButton, TextField, Typography } from "@material-ui/core";
 import { Send } from "@material-ui/icons";
 import { connect } from "react-redux";
 
@@ -10,6 +10,7 @@ class ChatBox extends Component {
     super(props);
     this.state = {
       text: "",
+      msgThere: false,
     };
     this.handleSocketEvents();
   }
@@ -21,6 +22,11 @@ class ChatBox extends Component {
   };
 
   gotMessageEventHandler = (message, username, fromSocketID) => {
+    this.setState({
+      msgThere: true,
+    });
+    var msgToDispaly = message.split("\n");
+    msgToDispaly = msgToDispaly.join("<br/>");
     var messageContainer = document.createElement("div");
     messageContainer.setAttribute("class", "message");
     var userContainer = document.createElement("div");
@@ -33,7 +39,7 @@ class ChatBox extends Component {
     messageContainer.append(userContainer);
     var dataContainer = document.createElement("div");
     dataContainer.setAttribute("class", "data");
-    dataContainer.innerHTML = message;
+    dataContainer.innerHTML = msgToDispaly;
     messageContainer.append(dataContainer);
     var allMessages = document.getElementById("chatbox-messages");
     allMessages.append(messageContainer);
@@ -63,10 +69,25 @@ class ChatBox extends Component {
     }
   };
 
+  sendMessageEnter = (e) => {
+    if (e.key === "Enter" && e.shiftKey) {
+      return;
+    } else if (e.key === "Enter") {
+      this.sendMessage(e);
+    }
+  };
+
   render() {
     return (
       <div className='chatbox'>
-        <div id='chatbox-messages' className='messages-container'></div>
+        <Typography variant='h5' align='center'>
+          CHAT
+        </Typography>
+        <div id='chatbox-messages' className='messages-container'>
+          {!this.state.msgThere && (
+            <div className='message'>No msgs to show ...</div>
+          )}
+        </div>
         {this.props.guest.isLoggedIn ? (
           <div className='send-text-form'>
             <div className='guest-chatbox'>
@@ -74,7 +95,11 @@ class ChatBox extends Component {
             </div>
           </div>
         ) : (
-          <form className='send-text-form' onSubmit={this.sendMessage}>
+          <form
+            className='send-text-form'
+            onSubmit={this.sendMessage}
+            onKeyPress={this.sendMessageEnter}
+          >
             <div className='textbox'>
               <TextField
                 classes={{ root: "message-input" }}
@@ -82,13 +107,16 @@ class ChatBox extends Component {
                 multiline
                 rowsMax={3}
                 fullWidth
+                autoFocus
                 onChange={this.handleTextChange}
                 value={this.state.text}
               />
             </div>
-            <IconButton type='submit'>
-              <Send fontSize='small' />
-            </IconButton>
+            <div className='send-message-btn'>
+              <IconButton type='submit'>
+                <Send fontSize='small' />
+              </IconButton>
+            </div>
           </form>
         )}
       </div>
