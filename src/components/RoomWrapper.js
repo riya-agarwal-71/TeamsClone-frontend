@@ -23,8 +23,6 @@ class RoomWrapper extends Component {
     this.socket = null;
     this.socketID = null;
     this.connections = {};
-    this.myScreenShareRef = React.createRef();
-    this.ScreenShareSocket = null;
 
     this.state = {
       infoModalOpen: false,
