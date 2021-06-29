@@ -7,6 +7,7 @@ import { server_url } from "../helper/urls";
 import { AskBeforeEntering, Room } from ".";
 import "../styles/room.scss";
 import { checkExistingRoom } from "../actions/room";
+import { Button } from "@material-ui/core";
 
 const peerConfig = {
   iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
@@ -22,6 +23,8 @@ class RoomWrapper extends Component {
     this.socket = null;
     this.socketID = null;
     this.connections = {};
+    this.myScreenShareRef = React.createRef();
+    this.ScreenShareSocket = null;
 
     this.state = {
       infoModalOpen: false,
@@ -30,13 +33,14 @@ class RoomWrapper extends Component {
       micOn: false,
       loading: true,
       roomExist: true,
+      redirectHome: false,
+      screenShare: false,
     };
 
     this.url = window.location.href;
     this.roomID = props.history.location.pathname.split("/");
     this.roomID = this.roomID[this.roomID.length - 1];
 
-    this.getUserPermissions();
     if (localStorage.token) {
       this.username = this.props.auth.user.name;
     } else {
@@ -52,10 +56,11 @@ class RoomWrapper extends Component {
     const self = this;
     this.props.dispatch(checkExistingRoom(roomCode)).then(() => {
       if (!self.props.room.success) {
-        console.log("Room Does not exist");
         self.setState({
           roomExist: false,
         });
+      } else {
+        self.getUserPermissions();
       }
     });
   };
@@ -158,13 +163,17 @@ class RoomWrapper extends Component {
     }
   };
 
-  sendStreamToPeer = (stream) => {
+  sendStreamToPeer = (
+    stream,
+    mySocketID = this.socketID,
+    mySocketConnection = this.socket
+  ) => {
     const self = this;
     if (stream === undefined || stream === null) {
       stream = this.silence();
     }
     for (let id in self.connections) {
-      if (id === self.socketID) continue;
+      if (id === mySocketID) continue;
       stream.getTracks().forEach((track) => {
         self.connections[id].addTrack(track, stream);
       });
@@ -172,7 +181,7 @@ class RoomWrapper extends Component {
         self.connections[id]
           .setLocalDescription(desc)
           .then(() => {
-            self.socket.emit(
+            mySocketConnection.emit(
               "set-description",
               id,
               self.connections[id].localDescription
@@ -449,9 +458,71 @@ class RoomWrapper extends Component {
     window.location.href = "/";
   };
 
+  redirectToHome = () => {
+    this.setState({
+      redirectHome: true,
+    });
+  };
+
+  handleScreenShare = () => {
+    this.setState(
+      (prevState) => {
+        return { screenShare: !prevState.screenShare };
+      },
+      () => {
+        if (this.state.screenShare) {
+          if (navigator.mediaDevices.getDisplayMedia) {
+            navigator.mediaDevices
+              .getDisplayMedia({ video: true, audio: true })
+              .then((stream) => {
+                try {
+                  window.myStream.getTracks().forEach((track) => track.stop());
+                } catch (error) {
+                  console.log(error);
+                }
+                window.myStream = stream;
+                this.myVideoRef.current.srcObject = stream;
+                this.sendStreamToPeer(stream);
+                stream.getTracks().forEach((track) => {
+                  track.onended = () => {
+                    this.setState(
+                      {
+                        screenShare: false,
+                      },
+                      () => {
+                        try {
+                          this.myVideoRef.current.srcObject
+                            .getTracks()
+                            .forEach((track) => track.stop());
+                        } catch (error) {
+                          console.log(error);
+                        }
+                        this.getCallMedia();
+                        this.getCssStyleForVideos();
+                      }
+                    );
+                  };
+                });
+              })
+              .then(() => {})
+              .catch((e) => console.log(e));
+          }
+        }
+      }
+    );
+  };
+
   render() {
-    if (!this.state.roomExist) {
+    if (this.state.redirectHome) {
       return <Redirect to={"/"} />;
+    }
+    if (!this.state.roomExist) {
+      return (
+        <div>
+          This room does not exist !
+          <Button onClick={this.redirectToHome}> Home </Button>
+        </div>
+      );
     }
     return (
       <div>
@@ -473,6 +544,9 @@ class RoomWrapper extends Component {
             loading={this.state.loading}
             username={this.username}
             getCssStyleForVideos={this.getCssStyleForVideos}
+            handleScreenShare={this.handleScreenShare}
+            screenShare={this.state.screenShare}
+            myScreenShareRef={this.myScreenShareRef}
           />
         ) : (
           <AskBeforeEntering

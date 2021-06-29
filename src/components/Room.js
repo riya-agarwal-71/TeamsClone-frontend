@@ -9,6 +9,8 @@ import {
   FileCopy,
   MicOff,
   VideocamOff,
+  ScreenShare,
+  StopScreenShare,
 } from "@material-ui/icons";
 import { ChatBox } from "./";
 
@@ -17,19 +19,30 @@ class Room extends Component {
     super(props);
     this.state = {
       chatboxVisible: false,
+      screenShare: false,
     };
   }
 
   displayChatbox = (e) => {
     e.preventDefault();
-    const self = this;
-    this.setState({
-      chatboxVisible: !self.state.chatboxVisible,
+    this.setState((prevState) => {
+      return { chatboxVisible: !prevState.chatboxVisible };
     });
     window.setTimeout(() => {
       this.props.getCssStyleForVideos();
     }, 50);
   };
+
+  // handleScreenShare = () => {
+  //   this.setState(
+  //     (prevState) => {
+  //       return { screenShare: !prevState.screenShare };
+  //     },
+  //     () => {
+  //       this.props.handleScreenShare(this.props.screenShare);
+  //     }
+  //   );
+  // };
 
   render() {
     const {
@@ -47,6 +60,9 @@ class Room extends Component {
       micOn,
       username,
       socket,
+      handleScreenShare,
+      screenShare,
+      myScreenShareRef,
     } = this.props;
     return (
       <div className='room-container'>
@@ -131,7 +147,16 @@ class Room extends Component {
               {videoOn ? <Videocam /> : <VideocamOff />}
             </IconButton>
           </div>
-          <div>
+          <div
+            style={{
+              width: "10%",
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <IconButton color='inherit' onClick={handleScreenShare}>
+              {screenShare ? <StopScreenShare /> : <ScreenShare />}
+            </IconButton>
             <IconButton color='inherit' onClick={this.displayChatbox}>
               <Chat />
             </IconButton>
