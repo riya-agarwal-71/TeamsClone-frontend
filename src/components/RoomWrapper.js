@@ -161,17 +161,16 @@ class RoomWrapper extends Component {
     }
   };
 
-  sendStreamToPeer = (
-    stream,
-    mySocketID = this.socketID,
-    mySocketConnection = this.socket
-  ) => {
+  sendStreamToPeer = (stream) => {
     const self = this;
     if (stream === undefined || stream === null) {
       stream = this.silence();
     }
     for (let id in self.connections) {
-      if (id === mySocketID) continue;
+      if (id === self.socketID) continue;
+      self.connections[id].getSenders().forEach((sender) => {
+        self.connections[id].removeTrack(sender);
+      });
       stream.getTracks().forEach((track) => {
         self.connections[id].addTrack(track, stream);
       });
@@ -179,7 +178,7 @@ class RoomWrapper extends Component {
         self.connections[id]
           .setLocalDescription(desc)
           .then(() => {
-            mySocketConnection.emit(
+            self.socket.emit(
               "set-description",
               id,
               self.connections[id].localDescription
@@ -382,24 +381,22 @@ class RoomWrapper extends Component {
     this.setState({
       loading: true,
     });
-    if (this.state.micOn) {
-      await this.setState({
-        micOn: false,
-      });
-    } else {
-      if (this.audioAvailable) {
-        await this.setState({
-          micOn: true,
-        });
-      } else {
-        return;
+
+    this.setState(
+      (prevState) => {
+        return {
+          micOn: !prevState.micOn && this.audioAvailable,
+        };
+      },
+      () => {
+        if (this.state.isAccepted) {
+          this.getCallMedia();
+          this.getCssStyleForVideos();
+        } else {
+          this.getMediaDevicesFromNavigator();
+        }
       }
-    }
-    if (this.state.isAccepted) {
-      this.getCallMedia();
-    } else {
-      this.getMediaDevicesFromNavigator();
-    }
+    );
     this.setState({
       loading: false,
     });
@@ -409,25 +406,22 @@ class RoomWrapper extends Component {
     this.setState({
       loading: true,
     });
-    if (this.state.videoOn) {
-      await this.setState({
-        videoOn: false,
-      });
-    } else {
-      if (this.videoAvailable) {
-        await this.setState({
-          videoOn: true,
-        });
-      } else {
-        return;
+
+    this.setState(
+      (prevState) => {
+        return {
+          videoOn: !prevState.videoOn && this.videoAvailable,
+        };
+      },
+      () => {
+        if (this.state.isAccepted) {
+          this.getCallMedia();
+          this.getCssStyleForVideos();
+        } else {
+          this.getMediaDevicesFromNavigator();
+        }
       }
-    }
-    if (this.state.isAccepted) {
-      this.getCallMedia();
-      this.getCssStyleForVideos();
-    } else {
-      this.getMediaDevicesFromNavigator();
-    }
+    );
     this.setState({
       loading: false,
     });
@@ -473,14 +467,17 @@ class RoomWrapper extends Component {
             navigator.mediaDevices
               .getDisplayMedia({ video: true, audio: true })
               .then((stream) => {
-                try {
-                  window.myStream.getTracks().forEach((track) => track.stop());
-                } catch (error) {
-                  console.log(error);
-                }
-                window.myStream = stream;
-                this.myVideoRef.current.srcObject = stream;
-                this.sendStreamToPeer(stream);
+                var newStream = new MediaStream();
+                stream.getTracks().forEach((track) => {
+                  newStream.addTrack(track);
+                });
+                window.myStream
+                  .getTracks()
+                  .forEach((track) => newStream.addTrack(track));
+                window.myStream = newStream;
+                this.myVideoRef.current.srcObject = window.myStream;
+                this.sendStreamToPeer(window.myStream);
+                this.getCssStyleForVideos();
                 stream.getTracks().forEach((track) => {
                   track.onended = () => {
                     this.setState(
@@ -489,9 +486,8 @@ class RoomWrapper extends Component {
                       },
                       () => {
                         try {
-                          this.myVideoRef.current.srcObject
-                            .getTracks()
-                            .forEach((track) => track.stop());
+                          window.myStream.removeTrack(track);
+                          this.myVideoRef.current.srcObject = window.myStream;
                         } catch (error) {
                           console.log(error);
                         }
@@ -505,6 +501,12 @@ class RoomWrapper extends Component {
               .then(() => {})
               .catch((e) => console.log(e));
           }
+        } else {
+          window.myStream.getTracks().forEach((track) => {
+            track.stop();
+          });
+          this.getCallMedia();
+          this.getCssStyleForVideos();
         }
       }
     );
@@ -544,7 +546,6 @@ class RoomWrapper extends Component {
             getCssStyleForVideos={this.getCssStyleForVideos}
             handleScreenShare={this.handleScreenShare}
             screenShare={this.state.screenShare}
-            myScreenShareRef={this.myScreenShareRef}
           />
         ) : (
           <AskBeforeEntering

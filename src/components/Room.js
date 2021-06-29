@@ -62,7 +62,6 @@ class Room extends Component {
       socket,
       handleScreenShare,
       screenShare,
-      myScreenShareRef,
     } = this.props;
     return (
       <div className='room-container'>
@@ -137,13 +136,21 @@ class Room extends Component {
             </Modal>
           </div>
           <div className='call-options'>
-            <IconButton color='inherit' onClick={toggleMicState}>
+            <IconButton
+              color='inherit'
+              onClick={toggleMicState}
+              disabled={screenShare}
+            >
               {micOn ? <Mic /> : <MicOff />}
             </IconButton>
             <IconButton color='inherit' onClick={endCall}>
               <CallEnd />
             </IconButton>
-            <IconButton color='inherit' onClick={toggleCameraState}>
+            <IconButton
+              color='inherit'
+              onClick={toggleCameraState}
+              disabled={screenShare}
+            >
               {videoOn ? <Videocam /> : <VideocamOff />}
             </IconButton>
           </div>
