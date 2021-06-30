@@ -10,7 +10,7 @@ import {
   Link,
 } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
-import { FlareSharp, Visibility, VisibilityOff } from "@material-ui/icons";
+import { Visibility, VisibilityOff } from "@material-ui/icons";
 import { signup, startSignup, clearAuthState } from "../actions/auth";
 import "../styles/signup.scss";
 

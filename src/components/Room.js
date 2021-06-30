@@ -33,17 +33,6 @@ class Room extends Component {
     }, 50);
   };
 
-  // handleScreenShare = () => {
-  //   this.setState(
-  //     (prevState) => {
-  //       return { screenShare: !prevState.screenShare };
-  //     },
-  //     () => {
-  //       this.props.handleScreenShare(this.props.screenShare);
-  //     }
-  //   );
-  // };
-
   render() {
     const {
       socketID,

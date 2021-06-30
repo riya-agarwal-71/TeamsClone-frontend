@@ -33,6 +33,8 @@ class RoomWrapper extends Component {
       roomExist: true,
       redirectHome: false,
       screenShare: false,
+      screenShareBy: "",
+      screenShareOther: false,
     };
 
     this.url = window.location.href;
@@ -70,16 +72,37 @@ class RoomWrapper extends Component {
     var videos = [...document.getElementsByClassName("video")];
     var max_height;
     var max_width;
+    var videoTag;
+    if (this.state.screenShare || this.state.screenShareOther) {
+      for (let i = 0; i < videos.length; i++) {
+        videos[i].style.display = "none";
+      }
+      var ssid = this.state.screenShareBy;
+      var video = document.querySelector(`[data-socket="${ssid}"]`);
+      if (video) {
+        videoTag = video.getElementsByTagName("video")[0];
+        video.style.display = "block";
+        videoTag.height = height;
+        videoTag.width = width;
+        video.style.height = height + "px";
+        video.style.width = width + "px";
+      } else {
+        console.log("Video not found !");
+      }
+      return;
+    }
+
     if (videos.length > 0) {
       for (let i = 0; i < videos.length; i++) {
         videos[i].style.display = "block";
       }
     }
+
     var myVideo;
     if (videos.length > 1) {
       myVideo = videos[0];
       videos.splice(0, 1);
-      var videoTag = myVideo.getElementsByTagName("video")[0];
+      videoTag = myVideo.getElementsByTagName("video")[0];
       videoTag.height = 110;
       videoTag.width = 170;
       var logo = myVideo.getElementsByClassName("logo")[0];
@@ -316,6 +339,36 @@ class RoomWrapper extends Component {
     if (id === self.socketID) self.sendStreamToPeer(window.myStream);
   };
 
+  screenShareEventHandler = (fromid) => {
+    const self = this;
+    this.setState(
+      () => {
+        return {
+          screenShareOther: true,
+          screenShareBy: `${fromid}`,
+        };
+      },
+      () => {
+        self.getCssStyleForVideos();
+      }
+    );
+  };
+
+  endScreenShareEventHandler = () => {
+    const self = this;
+    this.setState(
+      () => {
+        return {
+          screenShareOther: false,
+          screenShareBy: "",
+        };
+      },
+      () => {
+        self.getCssStyleForVideos();
+      }
+    );
+  };
+
   connectToSocket = () => {
     const socket = io(server_url);
     const self = this;
@@ -343,6 +396,10 @@ class RoomWrapper extends Component {
     });
 
     socket.on("user-joined", this.userJoinedEventHandler);
+
+    socket.on("screen-share", this.screenShareEventHandler);
+
+    socket.on("end-screen-share", this.endScreenShareEventHandler);
   };
 
   getMediaDevicesFromNavigator = () => {
@@ -457,6 +514,12 @@ class RoomWrapper extends Component {
   };
 
   handleScreenShare = () => {
+    if (this.state.screenShareOther) {
+      console.log(
+        "Other person sharing screen ask them to stop presenting to present "
+      );
+      return;
+    }
     this.setState(
       (prevState) => {
         return { screenShare: !prevState.screenShare };
@@ -468,16 +531,23 @@ class RoomWrapper extends Component {
               .getDisplayMedia({ video: true, audio: true })
               .then((stream) => {
                 var newStream = new MediaStream();
+                try {
+                  window.myStream
+                    .getVideoTracks()
+                    .forEach((track) => track.stop());
+                } catch (err) {
+                  console.log(err);
+                }
                 stream.getTracks().forEach((track) => {
                   newStream.addTrack(track);
                 });
                 window.myStream
-                  .getTracks()
+                  .getAudioTracks()
                   .forEach((track) => newStream.addTrack(track));
                 window.myStream = newStream;
                 this.myVideoRef.current.srcObject = window.myStream;
                 this.sendStreamToPeer(window.myStream);
-                this.getCssStyleForVideos();
+                this.socket.emit("screen-share", this.url);
                 stream.getTracks().forEach((track) => {
                   track.onended = () => {
                     this.setState(
@@ -493,13 +563,19 @@ class RoomWrapper extends Component {
                         }
                         this.getCallMedia();
                         this.getCssStyleForVideos();
+                        this.socket.emit("end-screen-share", this.url);
                       }
                     );
                   };
                 });
               })
               .then(() => {})
-              .catch((e) => console.log(e));
+              .catch((e) => {
+                console.log(e);
+                this.setState({
+                  screenShare: false,
+                });
+              });
           }
         } else {
           window.myStream.getTracks().forEach((track) => {
