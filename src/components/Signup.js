@@ -10,7 +10,7 @@ import {
   Link,
 } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
-import { Visibility, VisibilityOff } from "@material-ui/icons";
+import { FlareSharp, Visibility, VisibilityOff } from "@material-ui/icons";
 import { signup, startSignup, clearAuthState } from "../actions/auth";
 import "../styles/signup.scss";
 
@@ -25,11 +25,17 @@ class Signup extends Component {
       confirmPassword: "",
       name: "",
       redirect: false,
+      redirectToHome: false,
     };
   }
 
-  componentWillUnmount = () => {
-    this.props.dispatch(clearAuthState());
+  componentDidMount = () => {
+    if (this.props.auth.isLoggedIn) {
+      this.setState({
+        redirectToHome: true,
+      });
+      return;
+    }
   };
 
   handlePassVisibilty = () => {
@@ -87,6 +93,9 @@ class Signup extends Component {
   };
 
   render() {
+    if (this.state.redirectToHome) {
+      return <Redirect to={"/"} />;
+    }
     if (this.state.redirect) {
       return (
         <Redirect

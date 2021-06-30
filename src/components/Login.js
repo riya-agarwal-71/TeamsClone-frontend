@@ -30,6 +30,12 @@ class Login extends Component {
   }
 
   componentDidMount = () => {
+    if (this.props.auth.isLoggedIn) {
+      this.setState({
+        redirect: true,
+      });
+      return;
+    }
     this.props.dispatch(clearAuthState());
   };
 
