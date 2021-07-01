@@ -128,7 +128,7 @@ class Room extends Component {
             <IconButton
               color='inherit'
               onClick={toggleMicState}
-              disabled={screenShare}
+              // disabled={screenShare}
             >
               {micOn ? <Mic /> : <MicOff />}
             </IconButton>

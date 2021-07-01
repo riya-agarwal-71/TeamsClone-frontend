@@ -23,6 +23,8 @@ class RoomWrapper extends Component {
     this.socket = null;
     this.socketID = null;
     this.connections = {};
+    this.audioTrack = null;
+    this.videoTrack = null;
 
     this.state = {
       infoModalOpen: false,
@@ -165,6 +167,8 @@ class RoomWrapper extends Component {
           })
           .then((stream) => {
             window.myStream = stream;
+            this.audioTrack = stream.getAudioTracks()[0];
+            this.videoTrack = stream.getVideoTracks()[0];
             this.myVideoRef.current.srcObject = stream;
           })
           .catch((error) => console.log("ERROR ", error));
@@ -212,31 +216,100 @@ class RoomWrapper extends Component {
     }
   };
 
-  getCallMedia = () => {
+  getCallMedia = async () => {
     const self = this;
-    if (self.state.videoOn || self.state.micOn) {
-      navigator.mediaDevices
-        .getUserMedia({ video: self.state.videoOn, audio: self.state.micOn })
-        .then((stream) => {
-          try {
-            window.myStream.getTracks().forEach((track) => track.stop());
-          } catch (error) {}
-          window.myStream = stream;
-          self.myVideoRef.current.srcObject = stream;
-          self.sendStreamToPeer(window.myStream);
-        })
-        .then(() => {})
-        .catch((error) => console.log("ERROR ", error));
-    } else {
-      try {
-        window.myStream.getTracks().forEach((track) => track.stop());
-      } catch (error) {
-        console.log("ERROR ", error);
+
+    if (self.state.micOn) {
+      let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      if (self.audioTrack !== null) {
+        try {
+          let track = window.myStream.getTrackById(self.audioTrack.id);
+          track.stop();
+          window.myStream.removeTrack(track);
+        } catch (error) {
+          console.log(error);
+        }
       }
-      window.myStream = self.silence();
-      self.myVideoRef.current.srcObject = window.myStream;
-      self.sendStreamToPeer(window.myStream);
+      let tracks = stream.getTracks();
+      let newtrack = tracks[0];
+      window.myStream.addTrack(newtrack);
+      self.audioTrack = newtrack;
+    } else {
+      if (self.audioTrack !== null) {
+        try {
+          let track = window.myStream.getTrackById(self.audioTrack.id);
+          track.stop();
+          window.myStream.removeTrack(track);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+      self.audioTrack = null;
     }
+
+    if (self.state.videoOn) {
+      let stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      if (self.videoTrack !== null) {
+        try {
+          let track = window.myStream.getTrackById(self.videoTrack.id);
+          track.stop();
+          window.myStream.removeTrack(track);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+      let tracks = stream.getTracks();
+      let newtrack = tracks[0];
+      window.myStream.addTrack(newtrack);
+      self.videoTrack = newtrack;
+    } else {
+      if (self.videoTrack !== null) {
+        try {
+          let track = window.myStream.getTrackById(self.videoTrack.id);
+          track.stop();
+          window.myStream.removeTrack(track);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+      self.videoTrack = null;
+    }
+
+    if (!self.state.videoOn && !self.state.micOn) {
+      var stream = self.silence();
+      window.myStream.addTrack(stream.getTracks()[0]);
+    }
+
+    self.myVideoRef.current.srcObject = window.myStream;
+
+    if (self.state.isAccepted) {
+      self.sendStreamToPeer(window.myStream);
+      self.getCssStyleForVideos();
+    }
+
+    // if (self.state.videoOn || self.state.micOn) {
+    //   navigator.mediaDevices
+    //     .getUserMedia({ video: self.state.videoOn, audio: self.state.micOn })
+    //     .then((stream) => {
+    //       try {
+    //         window.myStream.getTracks().forEach((track) => track.stop());
+    //       } catch (error) {}
+    //       window.myStream = stream;
+    //       self.myVideoRef.current.srcObject = stream;
+    //       self.sendStreamToPeer(window.myStream);
+    //     })
+    //     .then(() => {})
+    //     .catch((error) => console.log("ERROR ", error));
+    // } else {
+    //   try {
+    //     window.myStream.getTracks().forEach((track) => track.stop());
+    //   } catch (error) {
+    //     console.log("ERROR ", error);
+    //   }
+    //   window.myStream = self.silence();
+    //   self.myVideoRef.current.srcObject = window.myStream;
+    //   self.sendStreamToPeer(window.myStream);
+    // }
   };
 
   changeDescriptionEventHandler = (from, description) => {
@@ -322,7 +395,7 @@ class RoomWrapper extends Component {
         }
         self.getCssStyleForVideos();
       };
-      if (id === self.socketID) return;
+      // if (id === self.socketID) return;
       if (window.myStream !== undefined && window.myStream !== null) {
         // console.log("SENT", window.myStream.getTracks(), " to ", socketid);
         window.myStream.getTracks().forEach((track) => {
@@ -341,6 +414,19 @@ class RoomWrapper extends Component {
 
   screenShareEventHandler = (fromid) => {
     const self = this;
+    if (fromid === self.socketID) {
+      this.setState(
+        () => {
+          return {
+            screenShareBy: `${fromid}`,
+          };
+        },
+        () => {
+          self.getCssStyleForVideos();
+        }
+      );
+      return;
+    }
     this.setState(
       () => {
         return {
@@ -359,6 +445,7 @@ class RoomWrapper extends Component {
     this.setState(
       () => {
         return {
+          screenShare: false,
           screenShareOther: false,
           screenShareBy: "",
         };
@@ -375,13 +462,23 @@ class RoomWrapper extends Component {
     this.socket = socket;
     socket.on("connect", () => {
       self.socketID = socket.id;
-      self.getMediaDevicesFromNavigator();
+      self.getCallMedia();
+      // self.getMediaDevicesFromNavigator();
       socket.emit("join-call", window.location.href, self.username);
     });
 
     socket.on("set-description", this.changeDescriptionEventHandler);
 
     socket.on("user-left", (socketid) => {
+      if (
+        this.state.screenShareOther &&
+        this.state.screenShareBy === socketid
+      ) {
+        this.setState({
+          screenShareOther: false,
+          screenShareBy: "",
+        });
+      }
       var videoElement = document.querySelector(`[data-socket="${socketid}"]`);
       if (videoElement) {
         videoElement.parentNode.removeChild(videoElement);
@@ -402,27 +499,27 @@ class RoomWrapper extends Component {
     socket.on("end-screen-share", this.endScreenShareEventHandler);
   };
 
-  getMediaDevicesFromNavigator = () => {
-    const self = this;
-    try {
-      window.myStream.getTracks().forEach((track) => track.stop());
-    } catch (e) {}
-    if (self.state.videoOn || self.state.micOn) {
-      navigator.mediaDevices
-        .getUserMedia({
-          audio: self.state.micOn,
-          video: self.state.videoOn,
-        })
-        .then((stream) => {
-          window.myStream = stream;
-          self.myVideoRef.current.srcObject = stream;
-        })
-        .catch((error) => console.log("ERROR", error));
-    } else {
-      window.myStream = self.silence();
-      self.myVideoRef.current.srcObject = window.myStream;
-    }
-  };
+  // getMediaDevicesFromNavigator = () => {
+  //   const self = this;
+  //   try {
+  //     window.myStream.getTracks().forEach((track) => track.stop());
+  //   } catch (e) {}
+  //   if (self.state.videoOn || self.state.micOn) {
+  //     navigator.mediaDevices
+  //       .getUserMedia({
+  //         audio: self.state.micOn,
+  //         video: self.state.videoOn,
+  //       })
+  //       .then((stream) => {
+  //         window.myStream = stream;
+  //         self.myVideoRef.current.srcObject = stream;
+  //       })
+  //       .catch((error) => console.log("ERROR", error));
+  //   } else {
+  //     window.myStream = self.silence();
+  //     self.myVideoRef.current.srcObject = window.myStream;
+  //   }
+  // };
 
   handleInfoModalOpen = () => this.setState({ infoModalOpen: true });
 
@@ -434,7 +531,7 @@ class RoomWrapper extends Component {
     this.connectToSocket();
   };
 
-  toggleMicState = async () => {
+  toggleMicState = () => {
     this.setState({
       loading: true,
     });
@@ -446,12 +543,13 @@ class RoomWrapper extends Component {
         };
       },
       () => {
-        if (this.state.isAccepted) {
-          this.getCallMedia();
-          this.getCssStyleForVideos();
-        } else {
-          this.getMediaDevicesFromNavigator();
-        }
+        this.getCallMedia();
+        // if (this.state.isAccepted) {
+        //   this.getCallMedia();
+        //   this.getCssStyleForVideos();
+        // } else {
+        //   this.getMediaDevicesFromNavigator();
+        // }
       }
     );
     this.setState({
@@ -459,7 +557,7 @@ class RoomWrapper extends Component {
     });
   };
 
-  toggleCameraState = async () => {
+  toggleCameraState = () => {
     this.setState({
       loading: true,
     });
@@ -471,12 +569,13 @@ class RoomWrapper extends Component {
         };
       },
       () => {
-        if (this.state.isAccepted) {
-          this.getCallMedia();
-          this.getCssStyleForVideos();
-        } else {
-          this.getMediaDevicesFromNavigator();
-        }
+        this.getCallMedia();
+        // if (this.state.isAccepted) {
+        //   this.getCallMedia();
+        //   this.getCssStyleForVideos();
+        // } else {
+        //   this.getMediaDevicesFromNavigator();
+        // }
       }
     );
     this.setState({
@@ -535,15 +634,16 @@ class RoomWrapper extends Component {
                   window.myStream
                     .getVideoTracks()
                     .forEach((track) => track.stop());
+                  this.videoTrack = null;
                 } catch (err) {
                   console.log(err);
                 }
                 stream.getTracks().forEach((track) => {
                   newStream.addTrack(track);
                 });
-                window.myStream
-                  .getAudioTracks()
-                  .forEach((track) => newStream.addTrack(track));
+                window.myStream.getAudioTracks().forEach((track) => {
+                  newStream.addTrack(track);
+                });
                 window.myStream = newStream;
                 this.myVideoRef.current.srcObject = window.myStream;
                 this.sendStreamToPeer(window.myStream);
@@ -557,10 +657,13 @@ class RoomWrapper extends Component {
                       () => {
                         try {
                           window.myStream.removeTrack(track);
-                          this.myVideoRef.current.srcObject = window.myStream;
+                          // this.myVideoRef.current.srcObject = window.myStream;
                         } catch (error) {
                           console.log(error);
                         }
+                        window.myStream = new MediaStream();
+                        this.audioTrack = null;
+                        this.videoTrack = null;
                         this.getCallMedia();
                         this.getCssStyleForVideos();
                         this.socket.emit("end-screen-share", this.url);
@@ -581,8 +684,12 @@ class RoomWrapper extends Component {
           window.myStream.getTracks().forEach((track) => {
             track.stop();
           });
+          window.myStream = new MediaStream();
+          this.audioTrack = null;
+          this.videoTrack = null;
           this.getCallMedia();
           this.getCssStyleForVideos();
+          this.socket.emit("end-screen-share", this.url);
         }
       }
     );
