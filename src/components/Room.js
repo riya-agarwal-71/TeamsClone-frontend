@@ -23,6 +23,18 @@ class Room extends Component {
     };
   }
 
+  componentDidMount = () => {
+    const self = this;
+    var main = document.getElementById("main");
+    const resize = new ResizeObserver(() => {
+      self.props.getCssStyleForVideos();
+    });
+    console.log(main);
+    if (main !== null) {
+      resize.observe(main);
+    }
+  };
+
   displayChatbox = (e) => {
     e.preventDefault();
     this.setState((prevState) => {
@@ -51,6 +63,8 @@ class Room extends Component {
       socket,
       handleScreenShare,
       screenShare,
+      showSSModal,
+      handleSSModalClose,
     } = this.props;
     return (
       <div className='room-container'>
@@ -153,6 +167,12 @@ class Room extends Component {
             <IconButton color='inherit' onClick={handleScreenShare}>
               {screenShare ? <StopScreenShare /> : <ScreenShare />}
             </IconButton>
+            <Modal open={showSSModal} onClose={handleSSModalClose}>
+              <div className='ss-modal'>
+                Please Ask the person sharing the screen to end the screen share
+                then you can sare the screen
+              </div>
+            </Modal>
             <IconButton color='inherit' onClick={this.displayChatbox}>
               <Chat />
             </IconButton>

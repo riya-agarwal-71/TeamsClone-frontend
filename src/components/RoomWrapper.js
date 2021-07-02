@@ -25,6 +25,7 @@ class RoomWrapper extends Component {
     this.connections = {};
     this.audioTrack = null;
     this.videoTrack = null;
+    this.participants = [];
 
     this.state = {
       infoModalOpen: false,
@@ -37,6 +38,7 @@ class RoomWrapper extends Component {
       screenShare: false,
       screenShareBy: "",
       screenShareOther: false,
+      showSSModal: false,
     };
 
     this.url = window.location.href;
@@ -75,6 +77,28 @@ class RoomWrapper extends Component {
     var max_height;
     var max_width;
     var videoTag;
+
+    var myVideo;
+    if (videos.length > 1) {
+      myVideo = videos[0];
+      videos.splice(0, 1);
+      myVideo.style.display = "block";
+      videoTag = myVideo.getElementsByTagName("video")[0];
+      videoTag.height = 110;
+      videoTag.width = 170;
+      var logo = myVideo.getElementsByClassName("logo")[0];
+      logo.style.width = 50 + "px";
+      logo.style.height = 50 + "px";
+      var heading = logo.getElementsByTagName("h1")[0];
+      heading.style.fontSize = "2rem";
+      myVideo.style.height = 110 + "px";
+      myVideo.style.width = 170 + "px";
+      myVideo.style.position = "absolute";
+      myVideo.style.top = 0;
+      myVideo.style.right = 0;
+      myVideo.style.zIndex = 5;
+    }
+
     if (this.state.screenShare || this.state.screenShareOther) {
       for (let i = 0; i < videos.length; i++) {
         videos[i].style.display = "none";
@@ -100,25 +124,6 @@ class RoomWrapper extends Component {
       }
     }
 
-    var myVideo;
-    if (videos.length > 1) {
-      myVideo = videos[0];
-      videos.splice(0, 1);
-      videoTag = myVideo.getElementsByTagName("video")[0];
-      videoTag.height = 110;
-      videoTag.width = 170;
-      var logo = myVideo.getElementsByClassName("logo")[0];
-      logo.style.width = 50 + "px";
-      logo.style.height = 50 + "px";
-      var heading = logo.getElementsByTagName("h1")[0];
-      heading.style.fontSize = "2rem";
-      myVideo.style.height = 110 + "px";
-      myVideo.style.width = 170 + "px";
-      myVideo.style.position = "absolute";
-      myVideo.style.top = 0;
-      myVideo.style.right = 0;
-      myVideo.style.zIndex = 5;
-    }
     if (videos.length <= 2) {
       max_height = height - 5;
       max_width = width / videos.length - 5;
@@ -247,7 +252,7 @@ class RoomWrapper extends Component {
       self.audioTrack = null;
     }
 
-    if (self.state.videoOn) {
+    if (self.state.videoOn && !self.state.screenShare) {
       let stream = await navigator.mediaDevices.getUserMedia({ video: true });
       if (self.videoTrack !== null) {
         try {
@@ -342,6 +347,9 @@ class RoomWrapper extends Component {
 
   userJoinedEventHandler = (id, usernames, clients) => {
     const self = this;
+    if (self.state.screenShare) {
+      self.socket.emit("screen-share", self.url);
+    }
     clients.forEach((socketid, ind) => {
       var username = usernames[ind];
       self.connections[socketid] = new RTCPeerConnection(peerConfig);
@@ -614,9 +622,12 @@ class RoomWrapper extends Component {
 
   handleScreenShare = () => {
     if (this.state.screenShareOther) {
-      console.log(
-        "Other person sharing screen ask them to stop presenting to present "
-      );
+      this.setState({
+        showSSModal: true,
+      });
+      // console.log(
+      //   "Other person sharing screen ask them to stop presenting to present "
+      // );
       return;
     }
     this.setState(
@@ -695,6 +706,12 @@ class RoomWrapper extends Component {
     );
   };
 
+  handleSSModalClose = () => {
+    this.setState({
+      showSSModal: false,
+    });
+  };
+
   render() {
     if (this.state.redirectHome) {
       return <Redirect to={"/"} />;
@@ -729,6 +746,8 @@ class RoomWrapper extends Component {
             getCssStyleForVideos={this.getCssStyleForVideos}
             handleScreenShare={this.handleScreenShare}
             screenShare={this.state.screenShare}
+            showSSModal={this.state.showSSModal}
+            handleSSModalClose={this.handleSSModalClose}
           />
         ) : (
           <AskBeforeEntering
