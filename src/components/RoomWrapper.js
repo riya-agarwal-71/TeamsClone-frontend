@@ -25,7 +25,6 @@ class RoomWrapper extends Component {
     this.connections = {};
     this.audioTrack = null;
     this.videoTrack = null;
-    this.participants = [];
 
     this.state = {
       infoModalOpen: false,
@@ -39,6 +38,8 @@ class RoomWrapper extends Component {
       screenShareBy: "",
       screenShareOther: false,
       showSSModal: false,
+      members: [],
+      focusOn: null,
     };
 
     this.url = window.location.href;
@@ -78,42 +79,62 @@ class RoomWrapper extends Component {
     var max_width;
     var videoTag;
 
+    if (this.state.focusOn !== null) {
+      for (let i = 0; i < videos.length; i++) {
+        videos[i].style.display = "none";
+      }
+      var focus = this.state.focusOn;
+      var video = document.querySelector(`[data-socket="${focus}"]`);
+      if (video) {
+        videoTag = video.getElementsByTagName("video")[0];
+        video.style.display = "block";
+        videoTag.height = height;
+        videoTag.width = width;
+        video.style.height = height + "px";
+        video.style.width = width + "px";
+      } else {
+        console.log("Video not found !");
+      }
+    }
+
     if (this.state.screenShare) {
       let ssScreen = document.getElementById("screen-share");
       ssScreen.style.display = "flex";
       ssScreen.style.zIndex = 10;
-      let main = document.getElementById("main");
-      main.style.width = "60vw";
     } else {
       let ssScreen = document.getElementById("screen-share");
       ssScreen.style.display = "none";
       ssScreen.style.zIndex = -1;
-      let main = document.getElementById("main");
-      main.style.width = "100vw";
     }
 
-    var myVideo;
-    if (videos.length > 1) {
-      myVideo = videos[0];
-      videos.splice(0, 1);
-      myVideo.style.display = "block";
-      if (this.state.screenShare) {
-        myVideo.style.display = "none";
+    if (this.state.focusOn !== this.socketID) {
+      var myVideo;
+      if (videos.length > 1) {
+        myVideo = videos[0];
+        videos.splice(0, 1);
+        myVideo.style.display = "block";
+        if (this.state.screenShare) {
+          myVideo.style.display = "none";
+        }
+        videoTag = myVideo.getElementsByTagName("video")[0];
+        videoTag.height = 110;
+        videoTag.width = 170;
+        var logo = myVideo.getElementsByClassName("logo")[0];
+        logo.style.width = 50 + "px";
+        logo.style.height = 50 + "px";
+        var heading = logo.getElementsByTagName("h1")[0];
+        heading.style.fontSize = "2rem";
+        myVideo.style.height = 110 + "px";
+        myVideo.style.width = 170 + "px";
+        myVideo.style.position = "absolute";
+        myVideo.style.top = 0;
+        myVideo.style.right = 0;
+        myVideo.style.zIndex = 5;
       }
-      videoTag = myVideo.getElementsByTagName("video")[0];
-      videoTag.height = 110;
-      videoTag.width = 170;
-      var logo = myVideo.getElementsByClassName("logo")[0];
-      logo.style.width = 50 + "px";
-      logo.style.height = 50 + "px";
-      var heading = logo.getElementsByTagName("h1")[0];
-      heading.style.fontSize = "2rem";
-      myVideo.style.height = 110 + "px";
-      myVideo.style.width = 170 + "px";
-      myVideo.style.position = "absolute";
-      myVideo.style.top = 0;
-      myVideo.style.right = 0;
-      myVideo.style.zIndex = 5;
+    }
+
+    if (this.state.focusOn !== null) {
+      return;
     }
 
     if (!this.state.screenShare && this.state.screenShareOther) {
@@ -375,6 +396,22 @@ class RoomWrapper extends Component {
           self.socket.emit("add-ice", socketid, event.candidate);
         }
       };
+      var participants = [];
+      usernames.forEach((username, index) => {
+        if (clients[index] === self.socketID) {
+          return;
+        }
+        participants.push({ username, socketid: clients[index] });
+      });
+
+      participants.sort((p1, p2) =>
+        p1.username > p2.username ? 1 : p1.username < p2.username ? -1 : 0
+      );
+
+      self.setState({
+        members: participants,
+      });
+
       self.connections[socketid].ontrack = (event) => {
         var searchVideo = document.querySelector(`[data-socket="${socketid}"]`);
         if (searchVideo === null || searchVideo === undefined) {
@@ -393,6 +430,10 @@ class RoomWrapper extends Component {
           var usernameHeading = document.createElement("h3");
           usernameHeading.innerHTML = username.toUpperCase();
           overlayUsername.append(usernameHeading);
+          var unpinButton = document.createElement("div");
+          unpinButton.innerHTML = "UNPIN";
+          unpinButton.addEventListener("click", this.cancelFocusOn);
+          overlayUsername.append(unpinButton);
           videoContainer.append(overlayUsername);
           var noVideoDiv = document.createElement("div");
           var logoDiv = document.createElement("div");
@@ -481,6 +522,28 @@ class RoomWrapper extends Component {
     );
   };
 
+  focusVideoOf = (socketid) => {
+    this.setState(
+      {
+        focusOn: socketid,
+      },
+      () => {
+        this.getCssStyleForVideos();
+      }
+    );
+  };
+
+  cancelFocusOn = () => {
+    this.setState(
+      {
+        focusOn: null,
+      },
+      () => {
+        this.getCssStyleForVideos();
+      }
+    );
+  };
+
   connectToSocket = () => {
     const socket = io(server_url);
     const self = this;
@@ -504,6 +567,11 @@ class RoomWrapper extends Component {
           screenShareBy: "",
         });
       }
+      var participants = this.state.members;
+      var newParticipants = participants.filter((p) => p.socketid !== socketid);
+      this.setState({
+        members: newParticipants,
+      });
       var videoElement = document.querySelector(`[data-socket="${socketid}"]`);
       if (videoElement) {
         videoElement.parentNode.removeChild(videoElement);
@@ -765,6 +833,9 @@ class RoomWrapper extends Component {
             screenShare={this.state.screenShare}
             showSSModal={this.state.showSSModal}
             handleSSModalClose={this.handleSSModalClose}
+            participants={this.state.members}
+            focusVideoOf={this.focusVideoOf}
+            cancelFocusOn={this.cancelFocusOn}
           />
         ) : (
           <AskBeforeEntering

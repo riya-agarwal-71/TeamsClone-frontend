@@ -189,9 +189,12 @@
 .chatbox-visible {
   height: 100%;
   border-radius: 10px 0 0 0;
-  width: 22vw;
+  width: 25vw;
   display: block;
   background-color: rgb(255, 255, 255);
+  // #main {
+  //   width: 75vw;
+  // }
 }
 
 .chatbox-not-visible {
@@ -243,4 +246,18 @@
   div {
     margin-bottom: 2rem;
   }
+  // .width-full {
+  //   width: 60vw;
+  // }
+  // .width-less {
+  //   width: 35vw;
+  // }
+}
+
+.width-full-ss {
+  width: 60vw;
+}
+
+.width-less-ss {
+  width: 35vw;
 }

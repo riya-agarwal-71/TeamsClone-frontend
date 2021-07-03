@@ -12,8 +12,9 @@ import {
   ScreenShare,
   StopScreenShare,
   PausePresentation,
+  People,
 } from "@material-ui/icons";
-import { ChatBox } from "./";
+import { ChatBox, Participants } from "./";
 
 class Room extends Component {
   constructor(props) {
@@ -21,6 +22,7 @@ class Room extends Component {
     this.state = {
       chatboxVisible: false,
       screenShare: false,
+      participantsListVisible: false,
     };
   }
 
@@ -38,12 +40,32 @@ class Room extends Component {
 
   displayChatbox = (e) => {
     e.preventDefault();
-    this.setState((prevState) => {
-      return { chatboxVisible: !prevState.chatboxVisible };
-    });
-    window.setTimeout(() => {
-      this.props.getCssStyleForVideos();
-    }, 50);
+    this.setState(
+      (prevState) => {
+        return {
+          chatboxVisible: !prevState.chatboxVisible,
+          participantsListVisible: false,
+        };
+      },
+      () => {
+        this.props.getCssStyleForVideos();
+      }
+    );
+  };
+
+  displayParticipantsList = (e) => {
+    e.preventDefault();
+    this.setState(
+      (prevState) => {
+        return {
+          chatboxVisible: false,
+          participantsListVisible: !prevState.participantsListVisible,
+        };
+      },
+      () => {
+        this.props.getCssStyleForVideos();
+      }
+    );
   };
 
   render() {
@@ -66,6 +88,9 @@ class Room extends Component {
       screenShare,
       showSSModal,
       handleSSModalClose,
+      participants,
+      focusVideoOf,
+      cancelFocusOn,
     } = this.props;
     return (
       <div className='room-container'>
@@ -88,8 +113,16 @@ class Room extends Component {
           <div
             id='main'
             className={
-              this.state.chatboxVisible
+              (this.state.chatboxVisible ||
+                this.state.participantsListVisible) &&
+              screenShare
+                ? "video-components width-less-ss"
+                : (this.state.chatboxVisible ||
+                    this.state.participantsListVisible) &&
+                  !screenShare
                 ? "video-components width-less"
+                : screenShare
+                ? "video-components width-full-ss"
                 : "video-components width-full"
             }
           >
@@ -102,6 +135,7 @@ class Room extends Component {
               ></video>
               <div className='username-video'>
                 <h3>ME</h3>
+                <div onClick={cancelFocusOn}>UNPIN</div>
               </div>
               <div
                 className={
@@ -113,6 +147,19 @@ class Room extends Component {
                 </div>
               </div>
             </div>
+          </div>
+          <div
+            className={
+              this.state.participantsListVisible
+                ? "chatbox-visible"
+                : "chatbox-not-visible"
+            }
+          >
+            <Participants
+              participants={participants}
+              socketID={socketID}
+              focusVideoOf={focusVideoOf}
+            />
           </div>
           <div
             className={
@@ -184,6 +231,9 @@ class Room extends Component {
                 A participant is already sharing screen
               </div>
             </Modal>
+            <IconButton color='inherit' onClick={this.displayParticipantsList}>
+              <People />
+            </IconButton>
             <IconButton color='inherit' onClick={this.displayChatbox}>
               <Chat />
             </IconButton>

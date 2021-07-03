@@ -8,6 +8,7 @@ import Page404 from "./Page404";
 import AskBeforeEntering from "./AskBeforeEntering";
 import Room from "./Room";
 import ChatBox from "./ChatBox";
+import Participants from "./Participants";
 
 export {
   App,
@@ -20,4 +21,5 @@ export {
   AskBeforeEntering,
   Room,
   ChatBox,
+  Participants,
 };
