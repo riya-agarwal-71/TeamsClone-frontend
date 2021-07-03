@@ -11,6 +11,7 @@ import {
   VideocamOff,
   ScreenShare,
   StopScreenShare,
+  PausePresentation,
 } from "@material-ui/icons";
 import { ChatBox } from "./";
 
@@ -69,6 +70,21 @@ class Room extends Component {
     return (
       <div className='room-container'>
         <div className='video-chat-container'>
+          <div id='screen-share' className='my-ss-screen'>
+            <div>
+              <h2>You are currently Presenting</h2>
+            </div>
+            <div>
+              <Button
+                variant='contained'
+                color='secondary'
+                startIcon={<PausePresentation />}
+                onClick={handleScreenShare}
+              >
+                Stop Presenting
+              </Button>
+            </div>
+          </div>
           <div
             id='main'
             className={
@@ -87,7 +103,11 @@ class Room extends Component {
               <div className='username-video'>
                 <h3>ME</h3>
               </div>
-              <div className={videoOn ? "dont-show" : "no-video-container"}>
+              <div
+                className={
+                  videoOn || screenShare ? "dont-show" : "no-video-container"
+                }
+              >
                 <div className='logo'>
                   <h1>{username.toUpperCase().substr(0, 1)}</h1>
                 </div>
@@ -139,21 +159,13 @@ class Room extends Component {
             </Modal>
           </div>
           <div className='call-options'>
-            <IconButton
-              color='inherit'
-              onClick={toggleMicState}
-              // disabled={screenShare}
-            >
+            <IconButton color='inherit' onClick={toggleMicState}>
               {micOn ? <Mic /> : <MicOff />}
             </IconButton>
             <IconButton color='inherit' onClick={endCall}>
               <CallEnd />
             </IconButton>
-            <IconButton
-              color='inherit'
-              onClick={toggleCameraState}
-              disabled={screenShare}
-            >
+            <IconButton color='inherit' onClick={toggleCameraState}>
               {videoOn ? <Videocam /> : <VideocamOff />}
             </IconButton>
           </div>
@@ -169,8 +181,7 @@ class Room extends Component {
             </IconButton>
             <Modal open={showSSModal} onClose={handleSSModalClose}>
               <div className='ss-modal'>
-                Please Ask the person sharing the screen to end the screen share
-                then you can sare the screen
+                A participant is already sharing screen
               </div>
             </Modal>
             <IconButton color='inherit' onClick={this.displayChatbox}>

@@ -78,11 +78,28 @@ class RoomWrapper extends Component {
     var max_width;
     var videoTag;
 
+    if (this.state.screenShare) {
+      let ssScreen = document.getElementById("screen-share");
+      ssScreen.style.display = "flex";
+      ssScreen.style.zIndex = 10;
+      let main = document.getElementById("main");
+      main.style.width = "60vw";
+    } else {
+      let ssScreen = document.getElementById("screen-share");
+      ssScreen.style.display = "none";
+      ssScreen.style.zIndex = -1;
+      let main = document.getElementById("main");
+      main.style.width = "100vw";
+    }
+
     var myVideo;
     if (videos.length > 1) {
       myVideo = videos[0];
       videos.splice(0, 1);
       myVideo.style.display = "block";
+      if (this.state.screenShare) {
+        myVideo.style.display = "none";
+      }
       videoTag = myVideo.getElementsByTagName("video")[0];
       videoTag.height = 110;
       videoTag.width = 170;
@@ -99,7 +116,7 @@ class RoomWrapper extends Component {
       myVideo.style.zIndex = 5;
     }
 
-    if (this.state.screenShare || this.state.screenShareOther) {
+    if (!this.state.screenShare && this.state.screenShareOther) {
       for (let i = 0; i < videos.length; i++) {
         videos[i].style.display = "none";
       }
