@@ -414,54 +414,54 @@ class RoomWrapper extends Component {
 
       self.connections[socketid].ontrack = (event) => {
         var searchVideo = document.querySelector(`[data-socket="${socketid}"]`);
-        if (searchVideo === null || searchVideo === undefined) {
-          var main = document.getElementById("main");
-          var videoContainer = document.createElement("div");
-          videoContainer.setAttribute("data-socket", socketid);
-          videoContainer.setAttribute("class", "video");
-          var videoElement = document.createElement("video");
-          videoElement.autoplay = true;
-          videoElement.playsInline = true;
-          videoElement.srcObject = event.streams[0];
-          videoElement.setAttribute("class", "video-element-call");
-          videoContainer.append(videoElement);
-          var overlayUsername = document.createElement("div");
-          overlayUsername.setAttribute("class", "username-video");
-          var usernameHeading = document.createElement("h3");
-          usernameHeading.innerHTML = username.toUpperCase();
-          overlayUsername.append(usernameHeading);
-          var unpinButton = document.createElement("div");
-          unpinButton.innerHTML = "UNPIN";
-          unpinButton.addEventListener("click", this.cancelFocusOn);
-          overlayUsername.append(unpinButton);
-          videoContainer.append(overlayUsername);
-          var noVideoDiv = document.createElement("div");
-          var logoDiv = document.createElement("div");
-          logoDiv.setAttribute("class", "logo");
-          var usernameLetter = document.createElement("h1");
-          usernameLetter.innerHTML = username.toUpperCase().substr(0, 1);
-          logoDiv.append(usernameLetter);
-          noVideoDiv.append(logoDiv);
-          videoContainer.append(noVideoDiv);
-          if (event.streams[0].getVideoTracks().length <= 0) {
-            noVideoDiv.setAttribute("class", "no-video-container");
-          } else {
-            noVideoDiv.setAttribute("class", "dont-show");
-          }
-          main.append(videoContainer);
+        // if (searchVideo === null || searchVideo === undefined) {
+        //   var main = document.getElementById("main");
+        //   var videoContainer = document.createElement("div");
+        //   videoContainer.setAttribute("data-socket", socketid);
+        //   videoContainer.setAttribute("class", "video");
+        //   var videoElement = document.createElement("video");
+        //   videoElement.autoplay = true;
+        //   videoElement.playsInline = true;
+        //   videoElement.srcObject = event.streams[0];
+        //   videoElement.setAttribute("class", "video-element-call");
+        //   videoContainer.append(videoElement);
+        //   var overlayUsername = document.createElement("div");
+        //   overlayUsername.setAttribute("class", "username-video");
+        //   var usernameHeading = document.createElement("h3");
+        //   usernameHeading.innerHTML = username.toUpperCase();
+        //   overlayUsername.append(usernameHeading);
+        //   var unpinButton = document.createElement("div");
+        //   unpinButton.innerHTML = "UNPIN";
+        //   unpinButton.addEventListener("click", this.cancelFocusOn);
+        //   overlayUsername.append(unpinButton);
+        //   videoContainer.append(overlayUsername);
+        //   var noVideoDiv = document.createElement("div");
+        //   var logoDiv = document.createElement("div");
+        //   logoDiv.setAttribute("class", "logo");
+        //   var usernameLetter = document.createElement("h1");
+        //   usernameLetter.innerHTML = username.toUpperCase().substr(0, 1);
+        //   logoDiv.append(usernameLetter);
+        //   noVideoDiv.append(logoDiv);
+        //   videoContainer.append(noVideoDiv);
+        //   if (event.streams[0].getVideoTracks().length <= 0) {
+        //     noVideoDiv.setAttribute("class", "no-video-container");
+        //   } else {
+        //     noVideoDiv.setAttribute("class", "dont-show");
+        //   }
+        //   main.append(videoContainer);
+        // } else {
+        var vid = searchVideo.getElementsByTagName("video")[0];
+        vid.srcObject = event.streams[0];
+        var noVidDiv = searchVideo.children[searchVideo.children.length - 1];
+        if (event.streams[0].getVideoTracks().length <= 0) {
+          noVidDiv.setAttribute("class", "no-video-container");
         } else {
-          var vid = searchVideo.getElementsByTagName("video")[0];
-          vid.srcObject = event.streams[0];
-          var noVidDiv = searchVideo.children[searchVideo.children.length - 1];
-          if (event.streams[0].getVideoTracks().length <= 0) {
-            noVidDiv.setAttribute("class", "no-video-container");
-          } else {
-            noVidDiv.setAttribute("class", "dont-show");
-          }
+          noVidDiv.setAttribute("class", "dont-show");
         }
+        // }
         self.getCssStyleForVideos();
       };
-      // if (id === self.socketID) return;
+      if (id === self.socketID) return;
       if (window.myStream !== undefined && window.myStream !== null) {
         // console.log("SENT", window.myStream.getTracks(), " to ", socketid);
         window.myStream.getTracks().forEach((track) => {
@@ -836,6 +836,7 @@ class RoomWrapper extends Component {
             participants={this.state.members}
             focusVideoOf={this.focusVideoOf}
             cancelFocusOn={this.cancelFocusOn}
+            focusOn={this.state.focusOn}
           />
         ) : (
           <AskBeforeEntering

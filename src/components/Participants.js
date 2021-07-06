@@ -36,10 +36,6 @@ class Participants extends Component {
                   <Typography variant='subtitle1'>{p.username}</Typography>
                 </div>
               </div>
-              //   <div>
-              //     {p.username.substr(0, 1).toUpperCase()}
-              //     <Typography>{p.username}</Typography>
-              //   </div>
             );
           })}
         </div>

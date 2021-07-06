@@ -91,6 +91,7 @@ class Room extends Component {
       participants,
       focusVideoOf,
       cancelFocusOn,
+      focusOn,
     } = this.props;
     return (
       <div className='room-container'>
@@ -134,8 +135,28 @@ class Room extends Component {
                 className='video-element-call'
               ></video>
               <div className='username-video'>
-                <h3>ME</h3>
-                <div onClick={cancelFocusOn}>UNPIN</div>
+                {focusOn !== null ? (
+                  <div className='focus-on-container'>
+                    <div className='focuson-icon'>
+                      <IconButton onClick={cancelFocusOn} size='large'>
+                        <img src='https://img.icons8.com/ios-glyphs/30/ffffff/unpin.png' />
+                      </IconButton>
+                    </div>
+                  </div>
+                ) : (
+                  <div className='focus-on-container'>
+                    <div className='focuson-icon'>
+                      <IconButton
+                        onClick={() => {
+                          focusVideoOf(socketID);
+                        }}
+                        size='large'
+                      >
+                        <img src='https://img.icons8.com/ios-glyphs/30/ffffff/pin3--v1.png' />
+                      </IconButton>
+                    </div>
+                  </div>
+                )}
               </div>
               <div
                 className={
@@ -147,6 +168,50 @@ class Room extends Component {
                 </div>
               </div>
             </div>
+
+            {participants.map((p) => {
+              return (
+                <div className='video' data-socket={`${p.socketid}`}>
+                  <video autoPlay className='video-element-call'></video>
+                  <div className='username-video'>
+                    <h3>{p.username}</h3>
+                    {focusOn !== null ? (
+                      <div className='focus-on-container'>
+                        <div className='focuson-icon'>
+                          <IconButton onClick={cancelFocusOn} size='large'>
+                            <img src='https://img.icons8.com/ios-glyphs/30/ffffff/unpin.png' />
+                          </IconButton>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className='focus-on-container'>
+                        <div className='focuson-icon'>
+                          <IconButton
+                            onClick={() => {
+                              focusVideoOf(p.socketid);
+                            }}
+                            size='large'
+                          >
+                            <img src='https://img.icons8.com/ios-glyphs/30/ffffff/pin3--v1.png' />
+                          </IconButton>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div
+                    className={
+                      videoOn || screenShare
+                        ? "dont-show"
+                        : "no-video-container"
+                    }
+                  >
+                    <div className='logo'>
+                      <h1>{p.username.toUpperCase().substr(0, 1)}</h1>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
           <div
             className={
