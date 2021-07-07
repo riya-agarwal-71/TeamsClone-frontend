@@ -103,7 +103,7 @@ class Login extends Component {
       return <Redirect to={this.props.location.state.from} />;
     }
     return (
-      <div className='root-contaniner'>
+      <div className='root-contaniner bg-img '>
         <div className='main-container'>
           {this.props.auth.success && (
             <div>

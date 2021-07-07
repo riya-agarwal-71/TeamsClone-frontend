@@ -1,7 +1,87 @@
-.home-container {
-  margin-top: 2rem;
-  margin-left: 1rem;
-  div {
-    margin: 2rem;
-  }
+.first-image {
+  width: 40vw;
+  height: 50vh;
+  object-fit: cover;
+  border-radius: 5px;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.details {
+  height: 50vh;
+  display: flex;
+  flex-direction: row;
+  position: relative;
+}
+
+.first-text {
+  width: 60vw;
+  padding: 3rem 0 0 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.buttons {
+  padding: 5rem 1rem 0 1rem;
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+  justify-content: space-around;
+}
+
+.my-flex-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.second-image {
+  width: 40vw;
+  height: 50vh;
+  object-fit: cover;
+  border-radius: 5px;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.second-text {
+  width: 60vw;
+  padding: 1rem;
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.third-text {
+  width: 60vw;
+  padding: 1rem;
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.last-div {
+  width: 100%;
+  display: flex;
+  height: 20vh;
+  justify-content: center;
+  align-items: center;
+}
+
+.change-font {
+  font-family: "Open Sans", sans-serif;
 }

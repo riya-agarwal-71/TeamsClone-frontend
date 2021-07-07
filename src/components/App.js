@@ -6,9 +6,16 @@ import {
   Route,
   Redirect,
 } from "react-router-dom";
+import { ThemeProvider, createMuiTheme } from "@material-ui/core/styles";
 
 import "../styles/index.scss";
 import { Home, Login, SignUp, RoomWrapper, Page404 } from "./";
+
+const theme = createMuiTheme({
+  typography: {
+    fontFamily: ["Amiko", "sans-serif"].join(","),
+  },
+});
 
 const PrivateRoute = (privateProps) => {
   const { isLoggedIn, location, component: Component } = privateProps;
@@ -38,23 +45,25 @@ const PrivateRoute = (privateProps) => {
 class App extends Component {
   render() {
     return (
-      <div>
-        <Router>
-          <Switch>
-            <Route exact path='/' component={Home} />
-            <Route path='/login' component={Login} />
-            <Route path='/signup' component={SignUp} />
-            <PrivateRoute
-              path='/room/:id'
-              component={RoomWrapper}
-              isLoggedIn={
-                this.props.auth.isLoggedIn || this.props.guest.isLoggedIn
-              }
-            />
-            <Route component={Page404} />
-          </Switch>
-        </Router>
-      </div>
+      <ThemeProvider theme={theme}>
+        <div>
+          <Router>
+            <Switch>
+              <Route exact path='/' component={Home} />
+              <Route path='/login' component={Login} />
+              <Route path='/signup' component={SignUp} />
+              <PrivateRoute
+                path='/room/:id'
+                component={RoomWrapper}
+                isLoggedIn={
+                  this.props.auth.isLoggedIn || this.props.guest.isLoggedIn
+                }
+              />
+              <Route component={Page404} />
+            </Switch>
+          </Router>
+        </div>
+      </ThemeProvider>
     );
   }
 }

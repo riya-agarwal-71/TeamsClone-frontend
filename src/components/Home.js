@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, InputBase } from "@material-ui/core";
+import { Button, Typography, TextField, Link } from "@material-ui/core";
 import randstr from "crypto-random-string";
 import { Navbar } from "./";
 import { Redirect } from "react-router-dom";
@@ -87,30 +87,106 @@ class Home extends Component {
     return (
       <div>
         <Navbar />
-        <div className='home-container'>
-          <div>
-            <Button
-              className='btn-margin'
-              variant='outlined'
-              onClick={this.createNewRoom}
-            >
-              Create a Room
-            </Button>
+        <div style={{ marginBottom: "5px" }}></div>
+        <div className='details'>
+          <Typography variant='h5' className='first-text change-font'>
+            Connecting with friends and family has never been easier !!
+            <div className='buttons'>
+              <Button
+                className='btn-margin'
+                variant='outlined'
+                onClick={this.createNewRoom}
+              >
+                Create a Room
+              </Button>
+              <div className='my-flex-row'>
+                <TextField
+                  placeholder='Enter the room id'
+                  onChange={this.handleRoomIdChange}
+                />
+                <div style={{ marginRight: "1rem" }}></div>
+                <Button
+                  className='btn-margin'
+                  variant='outlined'
+                  onClick={this.redirectToRoom}
+                >
+                  Join an existing room
+                </Button>
+              </div>
+            </div>
+          </Typography>
+          <img
+            className='first-image'
+            src='https://fj-employer-blog.s3.amazonaws.com/employer-blog/wp-content/uploads/2020/03/26155349/Keep-Team-Connected.png'
+          />
+        </div>
+        <div
+          className='details'
+          style={{ backgroundColor: "rgb(227,241,254)" }}
+        >
+          <img
+            className='second-image'
+            src='https://www.apptunix.com/blog/wp-content/uploads/sites/3/2020/06/Zoom-app-banner.jpg'
+          />
+          <div className='second-text change-font'>
+            <Typography variant='h5'>
+              <strong style={{ fontWeight: "bolder" }}>CALL : </strong>
+            </Typography>
+            <span> &nbsp; &nbsp;</span>
+            <Typography variant='h6'>
+              Share your opinion and catch up with your group...
+            </Typography>
           </div>
-          OR
-          <div>
-            <InputBase
-              placeholder='Enter the room id'
-              onChange={this.handleRoomIdChange}
-            />
-            <Button
-              className='btn-margin'
-              variant='outlined'
-              onClick={this.redirectToRoom}
-            >
-              Join an existing room
-            </Button>
+        </div>
+        <div
+          className='details'
+          style={{ backgroundColor: "rgb(254,245,240)" }}
+        >
+          <div className='third-text change-font'>
+            <Typography variant='h5'>
+              <strong style={{ fontWeight: "bolder" }}>CHAT : </strong>
+            </Typography>
+            <span> &nbsp; &nbsp;</span>
+            <Typography variant='h6'>
+              Send messages without disrupting the flow of the meeting...
+            </Typography>
           </div>
+          <img
+            className='first-image'
+            src='https://thumbs.dreamstime.com/b/online-video-chat-cartoon-happy-young-friend-characters-chatting-videoconference-desktop-app-online-video-chat-flat-vector-195813393.jpg'
+          />
+        </div>
+        <div className='details'>
+          <img
+            className='second-image'
+            src='https://eztalks.com/res/2021/03-16/13/00c4114b40f827b2b217ec0a0624490f.png'
+          />
+          <div className='second-text change-font'>
+            <Typography variant='h5'>
+              <strong style={{ fontWeight: "bolder" }}>SCREEN SHARE : </strong>
+            </Typography>
+            <span> &nbsp; &nbsp;</span>
+            <Typography variant='h6'>
+              Collaborate easily with the screen share option...
+            </Typography>
+          </div>
+        </div>
+        <div
+          className='last-div'
+          style={{
+            backgroundImage:
+              "linear-gradient(to bottom, white , rgb(227,241,254) 90%)",
+          }}
+        >
+          <Typography variant='h5'>
+            <Link
+              color='textPrimary'
+              href='/signup'
+              onClick={(e) => e.preventDefault}
+            >
+              <strong style={{ fontWeight: "bolder" }}>SIGN UP NOW !!</strong>
+            </Link>
+          </Typography>
         </div>
       </div>
     );
