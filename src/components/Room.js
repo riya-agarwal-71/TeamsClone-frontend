@@ -139,7 +139,10 @@ class Room extends Component {
                   <div className='focus-on-container'>
                     <div className='focuson-icon'>
                       <IconButton onClick={cancelFocusOn} size='large'>
-                        <img src='https://img.icons8.com/ios-glyphs/30/ffffff/unpin.png' />
+                        <img
+                          alt='unpin'
+                          src='https://img.icons8.com/ios-glyphs/30/ffffff/unpin.png'
+                        />
                       </IconButton>
                     </div>
                   </div>
@@ -152,7 +155,10 @@ class Room extends Component {
                         }}
                         size='large'
                       >
-                        <img src='https://img.icons8.com/ios-glyphs/30/ffffff/pin3--v1.png' />
+                        <img
+                          alt='pin'
+                          src='https://img.icons8.com/ios-glyphs/30/ffffff/pin3--v1.png'
+                        />
                       </IconButton>
                     </div>
                   </div>
@@ -179,7 +185,10 @@ class Room extends Component {
                       <div className='focus-on-container'>
                         <div className='focuson-icon'>
                           <IconButton onClick={cancelFocusOn} size='large'>
-                            <img src='https://img.icons8.com/ios-glyphs/30/ffffff/unpin.png' />
+                            <img
+                              alt='unpin'
+                              src='https://img.icons8.com/ios-glyphs/30/ffffff/unpin.png'
+                            />
                           </IconButton>
                         </div>
                       </div>
@@ -192,7 +201,10 @@ class Room extends Component {
                             }}
                             size='large'
                           >
-                            <img src='https://img.icons8.com/ios-glyphs/30/ffffff/pin3--v1.png' />
+                            <img
+                              alt='pin'
+                              src='https://img.icons8.com/ios-glyphs/30/ffffff/pin3--v1.png'
+                            />
                           </IconButton>
                         </div>
                       </div>

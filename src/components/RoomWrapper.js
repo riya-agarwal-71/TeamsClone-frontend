@@ -142,7 +142,7 @@ class RoomWrapper extends Component {
         videos[i].style.display = "none";
       }
       var ssid = this.state.screenShareBy;
-      var video = document.querySelector(`[data-socket="${ssid}"]`);
+      let video = document.querySelector(`[data-socket="${ssid}"]`);
       if (video) {
         videoTag = video.getElementsByTagName("video")[0];
         video.style.display = "block";
@@ -389,7 +389,6 @@ class RoomWrapper extends Component {
       self.socket.emit("screen-share", self.url);
     }
     clients.forEach((socketid, ind) => {
-      var username = usernames[ind];
       self.connections[socketid] = new RTCPeerConnection(peerConfig);
       self.connections[socketid].onicecandidate = function (event) {
         if (event.candidate) {

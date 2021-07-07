@@ -116,6 +116,7 @@ class Home extends Component {
             </div>
           </Typography>
           <img
+            alt='meet sample'
             className='first-image'
             src='https://fj-employer-blog.s3.amazonaws.com/employer-blog/wp-content/uploads/2020/03/26155349/Keep-Team-Connected.png'
           />
@@ -125,6 +126,7 @@ class Home extends Component {
           style={{ backgroundColor: "rgb(227,241,254)" }}
         >
           <img
+            alt='video call sample'
             className='second-image'
             src='https://www.apptunix.com/blog/wp-content/uploads/sites/3/2020/06/Zoom-app-banner.jpg'
           />
@@ -152,12 +154,14 @@ class Home extends Component {
             </Typography>
           </div>
           <img
+            alt='chat sample'
             className='first-image'
             src='https://thumbs.dreamstime.com/b/online-video-chat-cartoon-happy-young-friend-characters-chatting-videoconference-desktop-app-online-video-chat-flat-vector-195813393.jpg'
           />
         </div>
         <div className='details'>
           <img
+            alt='screen share sample'
             className='second-image'
             src='https://eztalks.com/res/2021/03-16/13/00c4114b40f827b2b217ec0a0624490f.png'
           />
