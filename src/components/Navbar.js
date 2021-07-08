@@ -32,7 +32,7 @@ class Navbar extends Component {
           {/* <img src="logo.png" alt="Logo" /> */}
           <Typography variant='h6' className='navbar-name'>
             <Link href='/' color='inherit' underline='none'>
-              Microsoft Teams
+              Microsoft Teams Clone
             </Link>
           </Typography>
           <div className='search-container'>
