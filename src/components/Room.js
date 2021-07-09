@@ -210,13 +210,7 @@ class Room extends Component {
                       </div>
                     )}
                   </div>
-                  <div
-                    className={
-                      videoOn || screenShare
-                        ? "dont-show"
-                        : "no-video-container"
-                    }
-                  >
+                  <div>
                     <div className='logo'>
                       <h1>{p.username.toUpperCase().substr(0, 1)}</h1>
                     </div>
