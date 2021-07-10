@@ -8,6 +8,8 @@ import {
   CLEAR_STATE,
   LOGOUT,
   AUTHENTICATE_USER,
+  GET_GROUP_SUCESS,
+  GET_GROUP_FAILED,
 } from "../actions/actionTypes";
 
 const initialState = {
@@ -16,6 +18,7 @@ const initialState = {
   isLoggedIn: false,
   inProgress: null,
   success: null,
+  groups: null,
 };
 
 export default function auth(state = initialState, action) {
@@ -59,6 +62,7 @@ export default function auth(state = initialState, action) {
         isLoggedIn: false,
         inProgress: false,
         user: {},
+        groups: null,
       };
     case AUTHENTICATE_USER:
       return {
@@ -74,6 +78,19 @@ export default function auth(state = initialState, action) {
         success: null,
         error: null,
         inProgress: null,
+      };
+    case GET_GROUP_SUCESS:
+      return {
+        ...state,
+        success: action.msg,
+        groups: action.grps,
+      };
+    case GET_GROUP_FAILED:
+      return {
+        ...state,
+        error: action.error,
+        success: null,
+        groups: null,
       };
     default:
       return state;
