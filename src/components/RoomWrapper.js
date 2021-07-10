@@ -571,10 +571,10 @@ class RoomWrapper extends Component {
       this.setState({
         members: newParticipants,
       });
-      var videoElement = document.querySelector(`[data-socket="${socketid}"]`);
-      if (videoElement) {
-        videoElement.parentNode.removeChild(videoElement);
-      }
+      // var videoElement = document.querySelector(`[data-socket="${socketid}"]`);
+      // if (videoElement) {
+      //   videoElement.parentNode.removeChild(videoElement);
+      // }
       self.getCssStyleForVideos();
     });
 
