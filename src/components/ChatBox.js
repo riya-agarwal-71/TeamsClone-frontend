@@ -25,6 +25,7 @@ class ChatBox extends Component {
     this.setState({
       msgThere: true,
     });
+    this.props.gotNewMessage();
     var msgToDispaly = message.split("\n");
     msgToDispaly = msgToDispaly.join("<br/>");
     var messageContainer = document.createElement("div");

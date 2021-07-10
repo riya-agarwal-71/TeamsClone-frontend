@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Toolbar, IconButton, Modal, Button } from "@material-ui/core";
+import { Toolbar, IconButton, Modal, Button, Badge } from "@material-ui/core";
 import {
   CallEnd,
   Mic,
@@ -23,6 +23,7 @@ class Room extends Component {
       chatboxVisible: false,
       screenShare: false,
       participantsListVisible: false,
+      showBadge: false,
     };
   }
 
@@ -45,6 +46,7 @@ class Room extends Component {
         return {
           chatboxVisible: !prevState.chatboxVisible,
           participantsListVisible: false,
+          showBadge: false,
         };
       },
       () => {
@@ -66,6 +68,16 @@ class Room extends Component {
         this.props.getCssStyleForVideos();
       }
     );
+  };
+
+  gotNewMessage = () => {
+    if (this.state.chatboxVisible) {
+      return;
+    } else {
+      this.setState({
+        showBadge: true,
+      });
+    }
   };
 
   render() {
@@ -239,7 +251,11 @@ class Room extends Component {
                 : "chatbox-not-visible"
             }
           >
-            <ChatBox username={username} socket={socket} />
+            <ChatBox
+              username={username}
+              socket={socket}
+              gotNewMessage={this.gotNewMessage}
+            />
           </div>
         </div>
         <Toolbar
@@ -306,7 +322,13 @@ class Room extends Component {
               <People />
             </IconButton>
             <IconButton color='inherit' onClick={this.displayChatbox}>
-              <Chat />
+              <Badge
+                color='secondary'
+                variant='dot'
+                invisible={!this.state.showBadge}
+              >
+                <Chat />
+              </Badge>
             </IconButton>
           </div>
         </Toolbar>
