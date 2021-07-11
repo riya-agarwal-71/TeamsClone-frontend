@@ -15,14 +15,7 @@ import {
   Paper,
 } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
-import {
-  Add,
-  VideoCall,
-  Send,
-  GroupAdd,
-  People,
-  Delete,
-} from "@material-ui/icons";
+import { Add, VideoCall, Send, GroupAdd, People } from "@material-ui/icons";
 import { getGroups } from "../actions/auth";
 import {
   createGroup,
@@ -31,7 +24,6 @@ import {
   clearGroupState,
   getParticipants,
   removeMember,
-  deleteGroup,
 } from "../actions/groups";
 import { sendMessage } from "../actions/message";
 import { startRoom, createRoom } from "../actions/room";
@@ -77,18 +69,18 @@ class Chats extends Component {
         this.state.selectedGrp === null ||
         this.state.selectedGrp._id !== groupID
       ) {
-        var grpDiv = document.querySelector(`[data-grpid="${groupID}"]`);
+        let grpDiv = document.querySelector(`[data-grpid="${groupID}"]`);
         if (!grpDiv || grpDiv === null || grpDiv === undefined) {
           return;
         }
-        var notification = grpDiv.getElementsByTagName("div")[0];
+        let notification = grpDiv.getElementsByTagName("div")[0];
         notification.style.display = "block";
       } else {
-        var grpDiv = document.querySelector(`[data-grpid="${groupID}"]`);
+        let grpDiv = document.querySelector(`[data-grpid="${groupID}"]`);
         if (!grpDiv || grpDiv === null || grpDiv === undefined) {
           return;
         }
-        var notification = grpDiv.getElementsByTagName("div")[0];
+        let notification = grpDiv.getElementsByTagName("div")[0];
         notification.style.display = "none";
         this.props.dispatch(getMessages(groupID)).then(() => {
           console.log(this.props.group.messages);
