@@ -14,3 +14,10 @@ export function getFormBody(params) {
 export function getAuthTokenFromLocalStorage() {
   return localStorage.getItem("token");
 }
+
+export function convertStrToHTMLDom(str) {
+  var parser = new DOMParser();
+  var doc = parser.parseFromString(str, "text/html");
+  console.log(doc.querySelector("body").innerHTML);
+  return doc.all[0].textContent;
+}

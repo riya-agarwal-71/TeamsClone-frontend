@@ -8,6 +8,8 @@ import {
   CLEAR_STATE,
   LOGOUT,
   AUTHENTICATE_USER,
+  GET_GROUP_SUCESS,
+  GET_GROUP_FAILED,
 } from "./actionTypes";
 
 import { APIUrls } from "../helper/urls";
@@ -119,5 +121,42 @@ export function authenticateUser(user) {
   return {
     type: AUTHENTICATE_USER,
     user,
+  };
+}
+
+export function getGrpSuccess(msg, grps) {
+  return {
+    type: GET_GROUP_SUCESS,
+    msg,
+    grps,
+  };
+}
+
+export function getGrpFailed(error) {
+  return {
+    type: GET_GROUP_FAILED,
+    error,
+  };
+}
+
+export function getGroups(email) {
+  return (dispatch) => {
+    const url = APIUrls.getGroups();
+    return fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: getFormBody({ email }),
+    })
+      .then((response) => response.json())
+      .then(({ data }) => {
+        if (data.success === true) {
+          dispatch(getGrpSuccess(data.message, data.data.groups));
+          return;
+        }
+        dispatch(getGrpFailed(data.message));
+        return;
+      });
   };
 }

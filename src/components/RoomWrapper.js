@@ -7,7 +7,7 @@ import { server_url } from "../helper/urls";
 import { AskBeforeEntering, Room } from ".";
 import "../styles/room.scss";
 import { checkExistingRoom } from "../actions/room";
-import { Button } from "@material-ui/core";
+import { Button, Typography } from "@material-ui/core";
 
 const peerConfig = {
   iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
@@ -802,9 +802,12 @@ class RoomWrapper extends Component {
     }
     if (!this.state.roomExist) {
       return (
-        <div>
-          This room does not exist !
-          <Button onClick={this.redirectToHome}> Home </Button>
+        <div className='room-doesnt-exist'>
+          <Typography variant='h3'> This room does not exist !</Typography>
+          <div style={{ width: 30, height: 30 }}></div>
+          <Button size='large' onClick={this.redirectToHome}>
+            <Typography variant='h6'>Back to Home</Typography>
+          </Button>
         </div>
       );
     }

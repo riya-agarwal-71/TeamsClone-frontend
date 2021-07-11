@@ -9,7 +9,7 @@ import {
 import { ThemeProvider, createMuiTheme } from "@material-ui/core/styles";
 
 import "../styles/index.scss";
-import { Home, Login, SignUp, RoomWrapper, Page404 } from "./";
+import { Home, Login, SignUp, RoomWrapper, Page404, Chats } from "./";
 
 const theme = createMuiTheme({
   typography: {
@@ -59,6 +59,7 @@ class App extends Component {
                   this.props.auth.isLoggedIn || this.props.guest.isLoggedIn
                 }
               />
+              <Route path='/chats' component={Chats} />
               <Route component={Page404} />
             </Switch>
           </Router>

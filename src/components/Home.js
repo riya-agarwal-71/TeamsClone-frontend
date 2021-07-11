@@ -15,8 +15,17 @@ class Home extends Component {
       redirectNewRoom: false,
       redirectExistingRoom: false,
       roomCode: "",
+      redirectToChats: false,
     };
   }
+
+  componentDidMount = () => {
+    if (this.props.auth.isLoggedIn) {
+      this.setState({
+        redirectToChats: true,
+      });
+    }
+  };
 
   createNewRoom = () => {
     const newRoomUrl =
@@ -64,6 +73,9 @@ class Home extends Component {
   };
 
   render() {
+    if (this.state.redirectToChats) {
+      return <Redirect to='/chats' />;
+    }
     if (this.state.redirectNewRoom) {
       return (
         <Redirect
@@ -200,6 +212,7 @@ class Home extends Component {
 function mapStateToProps(state) {
   return {
     room: state.room,
+    auth: state.auth,
   };
 }
 
