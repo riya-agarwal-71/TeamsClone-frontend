@@ -67,9 +67,9 @@
   width: 100%;
   overflow-y: scroll;
   overflow-x: hidden;
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  // &::-webkit-scrollbar {
+  //   display: none;
+  // }
 }
 
 .msgs-container {
@@ -85,18 +85,21 @@
 }
 
 .msg {
+  position: relative;
   display: flex;
   background-color: white;
-  width: 80%;
+  width: 60%;
   flex-direction: column;
   padding: 1rem;
   border-radius: 20px;
   margin-bottom: 1rem;
   margin-left: 3rem;
+  box-shadow: 0 0 5px rgb(172, 172, 172);
 }
 
 .from-user {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
+  // font-weight: bolder;
 }
 
 .msg-data {
@@ -176,9 +179,9 @@
   width: 100%;
   height: 25rem;
   overflow-y: scroll;
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  // &::-webkit-scrollbar {
+  //   display: none;
+  // }
   display: flex;
   flex-direction: column;
 }
@@ -187,9 +190,9 @@
   width: 100%;
   height: 90%;
   overflow-y: scroll;
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  // &::-webkit-scrollbar {
+  //   display: none;
+  // }
   display: flex;
   flex-direction: column;
 }
@@ -198,6 +201,10 @@
   width: 100%;
   padding: 0 1rem 0 2rem;
   border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
 }
 
 .new-msg-noti-visible {
@@ -214,4 +221,17 @@
   padding: 2px 2px 0 5px;
   box-sizing: border-box;
   color: white;
+}
+
+.date {
+  font-size: smaller;
+  font-weight: lighter;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+.my-text {
+  background-color: rgb(225, 225, 245);
+  margin-left: 15rem;
 }

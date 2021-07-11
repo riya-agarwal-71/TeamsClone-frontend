@@ -15,7 +15,14 @@ import {
   Paper,
 } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
-import { Add, VideoCall, Send, GroupAdd, People } from "@material-ui/icons";
+import {
+  Add,
+  VideoCall,
+  Send,
+  GroupAdd,
+  People,
+  Delete,
+} from "@material-ui/icons";
 import { getGroups } from "../actions/auth";
 import {
   createGroup,
@@ -23,6 +30,8 @@ import {
   addMember,
   clearGroupState,
   getParticipants,
+  removeMember,
+  deleteGroup,
 } from "../actions/groups";
 import { sendMessage } from "../actions/message";
 import { startRoom, createRoom } from "../actions/room";
@@ -32,6 +41,7 @@ class Chats extends Component {
     super(props);
     this.socket = null;
     this.socketID = null;
+    this.prevDate = null;
     this.state = {
       groups: [],
       messages: [],
@@ -74,6 +84,12 @@ class Chats extends Component {
         var notification = grpDiv.getElementsByTagName("div")[0];
         notification.style.display = "block";
       } else {
+        var grpDiv = document.querySelector(`[data-grpid="${groupID}"]`);
+        if (!grpDiv || grpDiv === null || grpDiv === undefined) {
+          return;
+        }
+        var notification = grpDiv.getElementsByTagName("div")[0];
+        notification.style.display = "none";
         this.props.dispatch(getMessages(groupID)).then(() => {
           console.log(this.props.group.messages);
           this.setState(
@@ -84,6 +100,32 @@ class Chats extends Component {
               this.props.dispatch(clearGroupState());
             }
           );
+        });
+      }
+    });
+
+    this.socket.on("remove-participant-group", (email, grpID) => {
+      if (email !== this.props.auth.user.email) {
+        return;
+      }
+      this.props.dispatch(getGroups(this.props.auth.user.email)).then(() => {
+        if (this.props.auth.groups != null) {
+          this.setState({
+            groups: this.props.auth.groups,
+          });
+        }
+      });
+      if (this.state.selectedGrp === null) {
+        return;
+      }
+      if (
+        this.state.selectedGrp !== null &&
+        this.state.selectedGrp !== undefined &&
+        this.state.selectedGrp._id === grpID
+      ) {
+        this.setState({
+          messages: [],
+          selectedGrp: null,
         });
       }
     });
@@ -385,6 +427,50 @@ class Chats extends Component {
     });
   };
 
+  handleRemoveParticipant = (by, to) => {
+    this.props
+      .dispatch(removeMember(by, to, this.state.selectedGrp._id))
+      .then(() => {
+        if (this.props.group.success !== null) {
+          this.socket.emit(
+            "remove-participant-group",
+            to,
+            this.state.selectedGrp._id
+          );
+          this.props
+            .dispatch(
+              sendMessage(
+                this.props.auth.user.email,
+                this.state.selectedGrp._id,
+                `removed ${to} from the group`
+              )
+            )
+            .then(() => {
+              this.socket.emit(
+                "send-message-group",
+                this.state.selectedGrp._id
+              );
+              this.props
+                .dispatch(getMessages(this.state.selectedGrp._id))
+                .then(() => {
+                  console.log(this.props.group.messages);
+                  this.setState(
+                    {
+                      messages: this.props.group.messages,
+                    },
+                    () => {
+                      this.props.dispatch(clearGroupState());
+                    }
+                  );
+                });
+            });
+        }
+      });
+    this.setState({
+      showParticipantsList: false,
+    });
+  };
+
   render() {
     if (!this.props.auth.isLoggedIn) {
       return <Redirect to='/' />;
@@ -434,13 +520,51 @@ class Chats extends Component {
                 <div className='participants-container'>
                   {this.state.participants.map((p) => {
                     return (
-                      <div className='participant'>
-                        {p.name}{" "}
-                        {p.email === this.props.auth.user.email ? "(ME)" : ""}
-                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                        {this.state.admin !== null &&
-                          this.state.admin.email === p.email &&
-                          "ADMIN"}
+                      <div
+                        className='participant'
+                        style={{ position: "relative" }}
+                      >
+                        <div>
+                          {p.name}{" "}
+                          {p.email === this.props.auth.user.email ? "(ME)" : ""}
+                          <div
+                            style={{
+                              position: "absolute",
+                              right: "2rem",
+                              top: "1rem",
+                            }}
+                          >
+                            {this.state.admin !== null &&
+                              this.state.admin.email === p.email &&
+                              "ADMIN"}
+                          </div>
+                        </div>
+                        <div
+                          style={{ fontWeight: "lighter", fontSize: "0.8rem" }}
+                        >
+                          {p.email}
+                        </div>
+                        {this.state.admin.email ===
+                          this.props.auth.user.email &&
+                          p.email !== this.props.auth.user.email && (
+                            <div
+                              style={{ position: "absolute", right: "1rem" }}
+                            >
+                              <Button
+                                size='small'
+                                variant='contained'
+                                color='secondary'
+                                onClick={() => {
+                                  this.handleRemoveParticipant(
+                                    this.state.admin.email,
+                                    p.email
+                                  );
+                                }}
+                              >
+                                Remove
+                              </Button>
+                            </div>
+                          )}
                       </div>
                     );
                   })}
@@ -564,7 +688,20 @@ class Chats extends Component {
                   {this.state.messages.length >= 1 ? (
                     this.state.messages.map((msg) => {
                       return (
-                        <div className='msg'>
+                        <div
+                          className={
+                            msg.from.email === this.props.auth.user.email
+                              ? "my-text msg"
+                              : "msg"
+                          }
+                        >
+                          <div className='date'>
+                            {
+                              new Date(msg.createdAt)
+                                .toString("YYYY-MM-dd")
+                                .split("GMT")[0]
+                            }
+                          </div>
                           <div className='from-user'>
                             {msg.from.email === this.props.auth.user.email
                               ? "ME"

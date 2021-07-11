@@ -112,7 +112,7 @@ export function addMember(byUser, newUser, grpID) {
 export function removeMember(from, toRemove, grpID) {
   return (dispatch) => {
     const url = APIUrls.removeMember();
-    fetch(url, {
+    return fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -158,7 +158,7 @@ export function getMessages(grpID) {
 export function deleteGroup(grpID, by) {
   return (dispatch) => {
     const url = APIUrls.deleteGroup();
-    fetch(url, {
+    return fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
