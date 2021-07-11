@@ -142,7 +142,7 @@ export function getGrpFailed(error) {
 export function getGroups(email) {
   return (dispatch) => {
     const url = APIUrls.getGroups();
-    fetch(url, {
+    return fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",

@@ -9,6 +9,7 @@ import AskBeforeEntering from "./AskBeforeEntering";
 import Room from "./Room";
 import ChatBox from "./ChatBox";
 import Participants from "./Participants";
+import Chats from "./Chats";
 
 export {
   App,
@@ -22,4 +23,5 @@ export {
   Room,
   ChatBox,
   Participants,
+  Chats,
 };

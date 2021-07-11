@@ -13,12 +13,13 @@ export function groupStart() {
   };
 }
 
-export function groupSuccessful(msg, id, messages = null) {
+export function groupSuccessful(msg, id, messages = null, admin = null) {
   return {
     type: GROUP_SUCCESS,
     msg,
     id,
     messages,
+    admin,
   };
 }
 
@@ -36,133 +37,142 @@ export function clearGroupState() {
 }
 
 export function createGroup(fromUser, name, particpantsStr = "") {
-  try {
-    return (dispatch) => {
-      const url = APIUrls.createGroup();
-      fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: getFormBody({ name, particpantsStr, fromUser }),
-      })
-        .then((res) => res.json())
-        .then(({ data }) => {
-          if (data.success) {
-            dispatch(groupSuccessful(data.message, data.data.id));
-            return;
-          }
-          dispatch(groupUnsucessful(data.message));
+  return (dispatch) => {
+    const url = APIUrls.createGroup();
+    return fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: getFormBody({ name, particpantsStr, fromUser }),
+    })
+      .then((res) => res.json())
+      .then(({ data }) => {
+        if (data.success) {
+          dispatch(groupSuccessful(data.message, data.data.id));
           return;
-        });
-    };
-  } catch (error) {
-    console.log(error);
-  }
+        }
+        dispatch(groupFailed(data.message));
+        return;
+      });
+  };
+}
+
+export function getParticipants(grpID) {
+  return (dispatch) => {
+    const url = APIUrls.getParticipants();
+    return fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: getFormBody({ grpID }),
+    })
+      .then((data) => data.json())
+      .then(({ data }) => {
+        if (data.success) {
+          dispatch(
+            groupSuccessful(
+              data.message,
+              data.data.id,
+              data.data.participants,
+              data.data.admin
+            )
+          );
+          return;
+        }
+        dispatch(groupFailed(data.message));
+        return;
+      });
+  };
 }
 
 export function addMember(byUser, newUser, grpID) {
-  try {
-    return (dispatch) => {
-      const url = APIUrls.addMember();
-      fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: getFormBody({ byUser, newUser, grpID }),
-      })
-        .then((data) => data.json())
-        .then(({ data }) => {
-          if (data.success) {
-            dispatch(groupSuccessful(data.message, data.data.id));
-            return;
-          }
-          dispatch(groupUnsucessful(data.message));
+  return (dispatch) => {
+    const url = APIUrls.addMember();
+    return fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: getFormBody({ byUser, newUser, grpID }),
+    })
+      .then((data) => data.json())
+      .then(({ data }) => {
+        if (data.success) {
+          dispatch(groupSuccessful(data.message, data.data.id));
           return;
-        });
-    };
-  } catch (error) {
-    console.log(error);
-  }
+        }
+        dispatch(groupFailed(data.message));
+        return;
+      });
+  };
 }
 
 export function removeMember(from, toRemove, grpID) {
-  try {
-    return (dispatch) => {
-      const url = APIUrls.removeMember();
-      fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: getFormBody({ from, toRemove, grpID }),
-      })
-        .then((data) => data.json())
-        .then(({ data }) => {
-          if (data.success) {
-            dispatch(groupSuccessful(data.message, data.data.id));
-            return;
-          }
-          dispatch(groupUnsucessful(data.message));
+  return (dispatch) => {
+    const url = APIUrls.removeMember();
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: getFormBody({ from, toRemove, grpID }),
+    })
+      .then((data) => data.json())
+      .then(({ data }) => {
+        if (data.success) {
+          dispatch(groupSuccessful(data.message, data.data.id));
           return;
-        });
-    };
-  } catch (error) {
-    console.log(error);
-  }
+        }
+        dispatch(groupFailed(data.message));
+        return;
+      });
+  };
 }
 
 export function getMessages(grpID) {
-  try {
-    return (dispatch) => {
-      const url = APIUrls.getMessages();
-      fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: getFormBody({ grpID }),
-      })
-        .then((data) => data.json())
-        .then(({ data }) => {
-          if (data.success) {
-            dispatch(
-              groupSuccessful(data.message, data.data.id, data.data.messages)
-            );
-            return;
-          }
-          dispatch(groupUnsucessful(data.message));
+  return (dispatch) => {
+    const url = APIUrls.getMessages();
+    return fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: getFormBody({ grpID }),
+    })
+      .then((data) => data.json())
+      .then(({ data }) => {
+        if (data.success) {
+          dispatch(
+            groupSuccessful(data.message, data.data.id, data.data.messages)
+          );
           return;
-        });
-    };
-  } catch (error) {
-    console.log(error);
-  }
+        }
+        dispatch(groupFailed(data.message));
+        return;
+      });
+  };
 }
 
 export function deleteGroup(grpID, by) {
-  try {
-    return (dispatch) => {
-      const url = APIUrls.deleteGroup();
-      fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: getFormBody({ by, grpID }),
-      })
-        .then((data) => data.json())
-        .then(({ data }) => {
-          if (data.success) {
-            dispatch(groupSuccessful(data.message, data.data.id));
-            return;
-          }
-          dispatch(groupUnsucessful(data.message));
+  return (dispatch) => {
+    const url = APIUrls.deleteGroup();
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: getFormBody({ by, grpID }),
+    })
+      .then((data) => data.json())
+      .then(({ data }) => {
+        if (data.success) {
+          dispatch(groupSuccessful(data.message, data.data.id));
           return;
-        });
-    };
-  } catch (error) {
-    console.log(error);
-  }
+        }
+        dispatch(groupFailed(data.message));
+        return;
+      });
+  };
 }

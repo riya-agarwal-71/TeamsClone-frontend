@@ -40,10 +40,10 @@ export function connectToSocket() {
       var socketID;
       socket.on("connect", () => {
         socketID = socket.id;
+        dispatch(socketSuccessfull(socket, socketID));
       });
-      dispatch(socketSuccessfull(socket, socketID));
       return;
-    } catch (err) {
+    } catch (error) {
       dispatch(socketFailed());
       console.log(error);
     }

@@ -11,6 +11,7 @@ const initialState = {
   error: null,
   id: null,
   messages: null,
+  admin: null,
 };
 
 export default function group(state = initialState, action) {
@@ -30,6 +31,7 @@ export default function group(state = initialState, action) {
         inProgress: false,
         id: action.id,
         messages: action.messages,
+        admin: action.admin,
       };
     case GROUP_FAILED:
       return {
@@ -47,6 +49,7 @@ export default function group(state = initialState, action) {
         inProgress: false,
         id: null,
         messages: null,
+        admin: null,
       };
     default:
       return state;
