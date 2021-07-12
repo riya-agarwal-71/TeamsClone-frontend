@@ -384,6 +384,7 @@ class Chats extends Component {
     e.preventDefault();
     this.setState({
       showParticipantsList: true,
+      inProgress: "participants",
     });
     // get the participants and update the state
     this.props
@@ -397,6 +398,7 @@ class Chats extends Component {
         } else {
           this.setState({
             showParticipantsList: false,
+            inProgress: null,
           });
         }
         this.props.dispatch(clearGroupState());
@@ -554,65 +556,81 @@ class Chats extends Component {
               {/* Participant slist modal */}
               <Paper className='create-group-paper more-length'>
                 <Typography variant='h4'>PARTICIPANTS</Typography>
-                <div className='participants-container'>
-                  {this.state.participants.map((p) => {
-                    return (
-                      <div
-                        className='participant'
-                        style={{ position: "relative" }}
-                      >
-                        <div>
-                          {p.name}{" "}
-                          {p.email === this.props.auth.user.email ? "(ME)" : ""}
+                {this.state.inProgress === "participants" ? (
+                  <div className='centerd' style={{ marginTop: "2rem" }}>
+                    <CircularProgress />
+                  </div>
+                ) : (
+                  <div>
+                    <div className='participants-container'>
+                      {this.state.participants.map((p) => {
+                        return (
                           <div
-                            style={{
-                              position: "absolute",
-                              right: "2rem",
-                              top: "1rem",
-                            }}
+                            className='participant'
+                            style={{ position: "relative" }}
                           >
-                            {this.state.admin !== null &&
-                              this.state.admin.email === p.email &&
-                              "ADMIN"}
-                          </div>
-                        </div>
-                        <div
-                          style={{ fontWeight: "lighter", fontSize: "0.8rem" }}
-                        >
-                          {p.email}
-                        </div>
-                        {this.state.admin.email ===
-                          this.props.auth.user.email &&
-                          p.email !== this.props.auth.user.email && (
-                            <div
-                              style={{ position: "absolute", right: "1rem" }}
-                            >
-                              <Button
-                                size='small'
-                                variant='contained'
-                                color='secondary'
-                                onClick={() => {
-                                  this.handleRemoveParticipant(
-                                    this.state.admin.email,
-                                    p.email
-                                  );
+                            <div>
+                              {p.name}{" "}
+                              {p.email === this.props.auth.user.email
+                                ? "(ME)"
+                                : ""}
+                              <div
+                                style={{
+                                  position: "absolute",
+                                  right: "2rem",
+                                  top: "1rem",
                                 }}
                               >
-                                Remove
-                              </Button>
+                                {this.state.admin !== null &&
+                                  this.state.admin.email === p.email &&
+                                  "ADMIN"}
+                              </div>
                             </div>
-                          )}
-                      </div>
-                    );
-                  })}
-                </div>
-                <Button
-                  onClick={this.closeParticipantsList}
-                  variant='contained'
-                  color='secondary'
-                >
-                  Close
-                </Button>
+                            <div
+                              style={{
+                                fontWeight: "lighter",
+                                fontSize: "0.8rem",
+                              }}
+                            >
+                              {p.email}
+                            </div>
+                            {this.state.admin.email ===
+                              this.props.auth.user.email &&
+                              p.email !== this.props.auth.user.email && (
+                                <div
+                                  style={{
+                                    position: "absolute",
+                                    right: "1rem",
+                                  }}
+                                >
+                                  <Button
+                                    size='small'
+                                    variant='contained'
+                                    color='secondary'
+                                    onClick={() => {
+                                      this.handleRemoveParticipant(
+                                        this.state.admin.email,
+                                        p.email
+                                      );
+                                    }}
+                                  >
+                                    Remove
+                                  </Button>
+                                </div>
+                              )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <Button
+                      onClick={this.closeParticipantsList}
+                      variant='contained'
+                      color='secondary'
+                    >
+                      Close
+                    </Button>
+                  </div>
+                )}
               </Paper>
             </div>
           )}
