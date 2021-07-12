@@ -14,6 +14,7 @@ import {
   Typography,
   IconButton,
   Paper,
+  CircularProgress,
 } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
 import { Add, VideoCall, Send, GroupAdd, People } from "@material-ui/icons";
@@ -38,6 +39,7 @@ class Chats extends Component {
     this.prevDate = null;
     // the local state of this component
     this.state = {
+      inProgress: null,
       groups: [],
       messages: [],
       selectedGrp: null,
@@ -67,10 +69,14 @@ class Chats extends Component {
       this.socket = this.props.socket.socket;
       this.socketID = this.props.socket.socketID;
       this.handleSocketEvents();
+      this.setState({
+        inProgress: "group",
+      });
       this.props.dispatch(getGroups(this.props.auth.user.email)).then(() => {
         if (this.props.auth.groups != null) {
           this.setState({
             groups: this.props.auth.groups,
+            inProgress: null,
           });
         }
       });
@@ -178,11 +184,14 @@ class Chats extends Component {
       notiDiv = notiDiv.getElementsByTagName("div")[0];
       notiDiv.style.display = "none";
     }
+    this.setState({
+      inProgress: "messages",
+    });
     this.props.dispatch(getMessages(grp._id)).then(() => {
-      console.log(this.props.group.messages);
       this.setState(
         {
           messages: this.props.group.messages,
+          inProgress: null,
         },
         () => {
           this.props.dispatch(clearGroupState());
@@ -671,35 +680,45 @@ class Chats extends Component {
               <Typography variant='h4'>GROUPS</Typography>
             </div>
             {/* Groups of user */}
-            <div className='grp-container'>
-              {this.state.groups.length <= 0 && (
-                <div style={{ padding: "0.5rem" }}>No groups to show</div>
-              )}
-              {this.state.groups.map((group) => {
-                return (
-                  <div
-                    className={
-                      this.state.selectedGrp !== null &&
-                      this.state.selectedGrp._id === group._id
-                        ? "grp selected"
-                        : "grp"
-                    }
-                    style={{ position: "relative" }}
-                    data-grpid={group._id}
-                    onClick={() => this.focusOn(group)}
-                  >
-                    {group.name}
-                    <div className='new-msg-noti-visible'>NEW MESSAGE !</div>
-                  </div>
-                );
-              })}
-            </div>
+            {this.state.inProgress === "group" ? (
+              <div className='centerd' style={{ marginTop: "2rem" }}>
+                <CircularProgress />
+              </div>
+            ) : (
+              <div className='grp-container'>
+                {this.state.groups.length <= 0 && (
+                  <div style={{ padding: "0.5rem" }}>No groups to show</div>
+                )}
+                {this.state.groups.map((group) => {
+                  return (
+                    <div
+                      className={
+                        this.state.selectedGrp !== null &&
+                        this.state.selectedGrp._id === group._id
+                          ? "grp selected"
+                          : "grp"
+                      }
+                      style={{ position: "relative" }}
+                      data-grpid={group._id}
+                      onClick={() => this.focusOn(group)}
+                    >
+                      {group.name}
+                      <div className='new-msg-noti-visible'>NEW MESSAGE !</div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
-          {/* Messages in vthe group */}
+          {/* Messages in the group */}
           <div className='group-messages'>
             {this.state.selectedGrp === null ? (
               <div style={{ padding: "1rem" }}>
                 Select a group to view messages
+              </div>
+            ) : this.state.inProgress === "messages" ? (
+              <div className='centerd' style={{ marginTop: "2rem" }}>
+                <CircularProgress />
               </div>
             ) : (
               <div>
