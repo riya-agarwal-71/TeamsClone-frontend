@@ -1,3 +1,5 @@
+// import all the components and export from here
+// which makes it easier to include multiple componenst in a signle file
 import App from "./App";
 import Navbar from "./Navbar";
 import Home from "./Home";

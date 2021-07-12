@@ -1,3 +1,4 @@
+// the home page of the app
 import React, { Component } from "react";
 import { Button, Typography, TextField, Link } from "@material-ui/core";
 import randstr from "crypto-random-string";
@@ -8,17 +9,21 @@ import { connect } from "react-redux";
 import { startRoom, createRoom, checkExistingRoom } from "../actions/room";
 import "../styles/home.scss";
 
+// home component
 class Home extends Component {
   constructor(props) {
     super(props);
+    // state of this component
     this.state = {
       redirectNewRoom: false,
       redirectExistingRoom: false,
       roomCode: "",
       redirectToChats: false,
+      roomExist: true,
     };
   }
 
+  // check if user is logged in if he is redirect to the chat room (that becomes the home page)
   componentDidMount = () => {
     if (this.props.auth.isLoggedIn) {
       this.setState({
@@ -27,7 +32,9 @@ class Home extends Component {
     }
   };
 
+  // function to create a new room
   createNewRoom = () => {
+    // get url using randstr
     const newRoomUrl =
       randstr({ length: 5, type: "alphanumeric" }) +
       "-" +
@@ -35,47 +42,50 @@ class Home extends Component {
       "-" +
       randstr({ length: 5, type: "alphanumeric" });
 
+    // dispatch the start room action
     const self = this;
     this.props.dispatch(startRoom());
     this.props.dispatch(createRoom(newRoomUrl)).then(() => {
+      // if room created then redirect to the room url
       if (self.props.room.success) {
         self.setState({
           redirectNewRoom: true,
           roomCode: newRoomUrl,
         });
-      } else {
-        console.log(self.props.room.error);
       }
     });
   };
 
+  // handle the input change value (for the eneter existing room url)
   handleRoomIdChange = (e) => {
     this.setState({
       roomUrl: e.target.value,
     });
   };
 
+  // function to redirect to existing room
   redirectToRoom = () => {
     let roomCode = this.state.roomUrl.split("/");
     roomCode = roomCode[roomCode.length - 1];
     const self = this;
     this.props.dispatch(startRoom());
     this.props.dispatch(checkExistingRoom(roomCode)).then(() => {
+      // if the room exists then redirect to the room
       if (self.props.room.success) {
         self.setState({
           redirectExistingRoom: true,
           roomCode: roomCode,
         });
-      } else {
-        console.log(self.props.room.error);
       }
     });
   };
 
   render() {
+    // if logged in redirect to chats
     if (this.state.redirectToChats) {
       return <Redirect to='/chats' />;
     }
+    // if redirect to new room then redirect to room url
     if (this.state.redirectNewRoom) {
       return (
         <Redirect
@@ -86,6 +96,7 @@ class Home extends Component {
         />
       );
     }
+    // if redirect to existing room ten redirect to room url
     if (this.state.redirectExistingRoom && this.state.roomCode) {
       return (
         <Redirect
@@ -209,6 +220,7 @@ class Home extends Component {
   }
 }
 
+// get access to room and auth state
 function mapStateToProps(state) {
   return {
     room: state.room,

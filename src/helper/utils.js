@@ -1,3 +1,4 @@
+// get the form body from the params
 export function getFormBody(params) {
   let formBody = [];
 
@@ -11,13 +12,7 @@ export function getFormBody(params) {
   return formBody.join("&");
 }
 
+// get the token from local storage
 export function getAuthTokenFromLocalStorage() {
   return localStorage.getItem("token");
-}
-
-export function convertStrToHTMLDom(str) {
-  var parser = new DOMParser();
-  var doc = parser.parseFromString(str, "text/html");
-  console.log(doc.querySelector("body").innerHTML);
-  return doc.all[0].textContent;
 }

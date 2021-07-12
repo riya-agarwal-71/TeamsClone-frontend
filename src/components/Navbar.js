@@ -1,22 +1,23 @@
+// navbar component
 import React, { Component } from "react";
 import { connect } from "react-redux";
-// import jwt_decode from "jwt-decode";
 import {
   AppBar,
   Toolbar,
-  // IconButton,
   Typography,
-  // InputBase,
   Button,
   ButtonGroup,
   Link,
 } from "@material-ui/core";
-// import { Menu, Search } from "@material-ui/icons";
 
 import "../styles/navbar.scss";
 import { logout } from "../actions/auth";
 
+// navbar class component
 class Navbar extends Component {
+  // doesnt require state
+
+  // function to log the user out
   handleLogout = () => {
     localStorage.removeItem("token");
     this.props.dispatch(logout());
@@ -26,21 +27,13 @@ class Navbar extends Component {
     return (
       <AppBar position='static' className='navbar-top'>
         <Toolbar>
-          {/* <IconButton color="inherit">
-            <Menu color="inherit" />
-          </IconButton> */}
-          {/* <img src="logo.png" alt="Logo" /> */}
+          {/* The name of the app which redirects you to home page */}
           <Typography variant='h6' className='navbar-name'>
             <Link href='/' color='inherit' underline='none'>
               Microsoft Teams Clone
             </Link>
           </Typography>
-          <div className='search-container'>
-            {/* <div className="search-icon-div">
-              <Search className="search-icon" />
-            </div>
-            <InputBase placeholder="Search" className="search-input" /> */}
-          </div>
+          {/* Display the user info and the logout button if logged in else display the login signup buttons */}
           <div className='navbar-icons'>
             {this.props.auth.isLoggedIn ? (
               <div className='flex-row-cst'>
@@ -66,6 +59,7 @@ class Navbar extends Component {
   }
 }
 
+// get the access to auth state in props
 function mapStateToProps(state) {
   return {
     auth: state.auth,

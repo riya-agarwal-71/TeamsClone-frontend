@@ -1,3 +1,4 @@
+// get all the required action types
 import {
   LOGIN_FAILED,
   START_LOGIN,
@@ -12,6 +13,7 @@ import {
   GET_GROUP_FAILED,
 } from "../actions/actionTypes";
 
+// define the inital state
 const initialState = {
   user: {},
   error: null,
@@ -21,6 +23,7 @@ const initialState = {
   groups: null,
 };
 
+// define the reducer function for the auth state changes
 export default function auth(state = initialState, action) {
   switch (action.type) {
     case START_SIGNUP:

@@ -1,3 +1,4 @@
+// import all the action types
 import {
   ROOM_FAILED,
   ROOM_SUCCESSFULL,
@@ -5,6 +6,7 @@ import {
   CLEAR_ROOM,
 } from "../actions/actionTypes";
 
+// define the initial state
 const initialState = {
   success: false,
   error: null,
@@ -12,6 +14,7 @@ const initialState = {
   url: "",
 };
 
+// the reducer function to change the room state
 export default function room(state = initialState, action) {
   switch (action.type) {
     case START_ROOM:

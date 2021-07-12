@@ -1,3 +1,4 @@
+// import all the required action types
 import {
   START_SOCKET,
   SOCKET_FAILED,
@@ -5,12 +6,14 @@ import {
   CLEAR_SOCKET_STATE,
 } from "../actions/actionTypes";
 
+// define the inital state
 const initialState = {
   inProgress: false,
   socket: null,
   socketID: null,
 };
 
+// the reducer function to change the socket state
 export default function socket(state = initialState, action) {
   switch (action.type) {
     case START_SOCKET:

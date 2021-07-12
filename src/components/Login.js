@@ -1,3 +1,4 @@
+// login component to render the login page
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Redirect } from "react-router-dom";
@@ -16,9 +17,11 @@ import { startLogin, login, clearAuthState } from "../actions/auth";
 import "../styles/signup.scss";
 import { guestLogin } from "../actions/guest";
 
+// the login component
 class Login extends Component {
   constructor(props) {
     super(props);
+    // the state of this component
     this.state = {
       email: "",
       password: "",
@@ -29,6 +32,7 @@ class Login extends Component {
     };
   }
 
+  // if logged in then redirect to home page
   componentDidMount = () => {
     if (this.props.auth.isLoggedIn) {
       this.setState({
@@ -39,25 +43,30 @@ class Login extends Component {
     this.props.dispatch(clearAuthState());
   };
 
+  // function to track the input in the password field
   handlePasswordChange = (e) => {
     this.setState({
       password: e.target.value,
     });
   };
 
+  // function to track the input in the email field
   handleEmailChange = (e) => {
     this.setState({
       email: e.target.value,
     });
   };
 
+  // function to submit the login form
   handleFormSubmit = (e) => {
     e.preventDefault();
     const { email, password } = this.state;
+    // start the login and login with the email and password
     this.props.dispatch(startLogin());
     this.props.dispatch(login(email, password));
   };
 
+  // if logged in successfully then redirect to home page
   redirectToHome = () => {
     if (this.props.auth.success != null) {
       setTimeout(() => {
@@ -68,6 +77,7 @@ class Login extends Component {
     }
   };
 
+  // function to change the visibility of the password
   handlePasswordVisibilty = () => {
     const self = this;
     this.setState({
@@ -75,18 +85,18 @@ class Login extends Component {
     });
   };
 
+  // function to login as guest (only applicable when entering a room)
   handleGuestFormSubmit = (e) => {
     e.preventDefault();
     var guestUsername = this.state.username;
     guestUsername = guestUsername + " (Guest)";
-    console.log(guestUsername);
-    console.log(this.props.location.state.from);
     this.props.dispatch(guestLogin(guestUsername));
     this.setState({
       redirectGuest: true,
     });
   };
 
+  // function to track the change in the guest name field
   handleGuestNameChange = (e) => {
     this.setState({
       username: e.target.value,
@@ -94,17 +104,24 @@ class Login extends Component {
   };
 
   render() {
+    // if want to redirect
     if (this.state.redirect) {
+      // if there is a from in the location (passed down in case of enetring a meet) redirect to room url
       if (this.props.location.state) {
         return <Redirect to={this.props.location.state.from} />;
       }
+      // redirect to home
       return <Redirect to={"/"} />;
-    } else if (this.state.redirectGuest) {
+    }
+    // if there is a guest redirect (will always have the from else we wont accept the guest login)
+    else if (this.state.redirectGuest) {
+      // redirect to room
       return <Redirect to={this.props.location.state.from} />;
     }
     return (
       <div className='root-contaniner bg-img '>
         <div className='main-container'>
+          {/* the success alert */}
           {this.props.auth.success && (
             <div>
               <Alert key={0} severity={"success"} classes={{ root: "alert" }}>
@@ -112,12 +129,15 @@ class Login extends Component {
               </Alert>
             </div>
           )}
+          {/* if success then redirect to home (checked in the function) */}
           {this.redirectToHome()}
+          {/* the error alert */}
           {this.props.auth.error && (
             <Alert key={0} severity={"error"} classes={{ root: "alert" }}>
               {this.props.auth.error}
             </Alert>
           )}
+          {/* The login form */}
           <form onSubmit={this.handleFormSubmit}>
             <Paper className='form'>
               <div className='heading'>
@@ -176,11 +196,11 @@ class Login extends Component {
             </Paper>
           </form>
         </div>
+        {/* Only show the guest login if we are here from the room url */}
         {this.props.location.state && !this.props.location.state.isNew && (
-          <div className='or-container'>
-            <Typography variant='h6'>OR</Typography>
-          </div>
+          <div className='or-container'></div>
         )}
+        {/* The guest login form */}
         {this.props.location.state && !this.props.location.state.isNew && (
           <div className='main-container'>
             <form onSubmit={this.handleGuestFormSubmit}>
@@ -211,6 +231,7 @@ class Login extends Component {
   }
 }
 
+// get access to the auth state in the props
 function mapStateToProps(state) {
   return {
     auth: state.auth,

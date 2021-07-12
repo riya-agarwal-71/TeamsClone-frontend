@@ -1,3 +1,4 @@
+// get all the necessary action types
 import {
   MESSAGE_FAILED,
   MESSAGE_SUCCESS,
@@ -5,6 +6,7 @@ import {
   CLEAR_MESSAGE_STATE,
 } from "../actions/actionTypes";
 
+// define the initial state
 const initialState = {
   inProgress: false,
   error: null,
@@ -12,6 +14,7 @@ const initialState = {
   msg: null,
 };
 
+// the reducer function to change the message state
 export default function message(state = initialState, action) {
   switch (action.type) {
     case START_MESSAGE:

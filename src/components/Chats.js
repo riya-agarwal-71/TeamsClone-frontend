@@ -1,3 +1,4 @@
+// the component to show the groups and the chat
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Redirect } from "react-router-dom";
@@ -28,12 +29,14 @@ import {
 import { sendMessage } from "../actions/message";
 import { startRoom, createRoom } from "../actions/room";
 
+// the chat class component
 class Chats extends Component {
   constructor(props) {
     super(props);
     this.socket = null;
     this.socketID = null;
     this.prevDate = null;
+    // the local state of this component
     this.state = {
       groups: [],
       messages: [],
@@ -49,80 +52,13 @@ class Chats extends Component {
     };
   }
 
-  handleSocketEvents = () => {
-    this.socket.on("participant-add-grp", (email, grpID) => {
-      if (email === this.props.auth.user.email) {
-        this.props.dispatch(getGroups(this.props.auth.user.email)).then(() => {
-          if (this.props.auth.groups != null) {
-            this.setState({
-              groups: this.props.auth.groups,
-            });
-          }
-        });
-      } else {
-        return;
-      }
-    });
-
-    this.socket.on("message-recieved-group", (groupID) => {
-      if (
-        this.state.selectedGrp === null ||
-        this.state.selectedGrp._id !== groupID
-      ) {
-        let grpDiv = document.querySelector(`[data-grpid="${groupID}"]`);
-        if (!grpDiv || grpDiv === null || grpDiv === undefined) {
-          return;
-        }
-        let notification = grpDiv.getElementsByTagName("div")[0];
-        notification.style.display = "block";
-      } else {
-        let grpDiv = document.querySelector(`[data-grpid="${groupID}"]`);
-        if (!grpDiv || grpDiv === null || grpDiv === undefined) {
-          return;
-        }
-        let notification = grpDiv.getElementsByTagName("div")[0];
-        notification.style.display = "none";
-        this.props.dispatch(getMessages(groupID)).then(() => {
-          console.log(this.props.group.messages);
-          this.setState(
-            {
-              messages: this.props.group.messages,
-            },
-            () => {
-              this.props.dispatch(clearGroupState());
-            }
-          );
-        });
-      }
-    });
-
-    this.socket.on("remove-participant-group", (email, grpID) => {
-      if (email !== this.props.auth.user.email) {
-        return;
-      }
-      this.props.dispatch(getGroups(this.props.auth.user.email)).then(() => {
-        if (this.props.auth.groups != null) {
-          this.setState({
-            groups: this.props.auth.groups,
-          });
-        }
-      });
-      if (this.state.selectedGrp === null) {
-        return;
-      }
-      if (
-        this.state.selectedGrp !== null &&
-        this.state.selectedGrp !== undefined &&
-        this.state.selectedGrp._id === grpID
-      ) {
-        this.setState({
-          messages: [],
-          selectedGrp: null,
-        });
-      }
-    });
+  // dispatch the connect to socket method action
+  componentDidMount = () => {
+    this.props.dispatch(startSocketConnection());
+    this.props.dispatch(connectToSocket());
   };
 
+  // if socket is connected then get the groups of the user (only if the socket changes in any manner)
   componentDidUpdate = (prevProps) => {
     if (
       prevProps.socket.socket !== this.props.socket.socket &&
@@ -140,27 +76,103 @@ class Chats extends Component {
       });
     }
 
+    // each time the dom updates then scroll to the bottom of the chat box
     var chatBox = document.getElementById("chat-box");
     if (chatBox) {
       chatBox.scrollTop = chatBox.scrollHeight;
     }
   };
 
+  // function to handle the socket events
+  handleSocketEvents = () => {
+    // event of addign a participant to the group
+    this.socket.on("participant-add-grp", (email, grp) => {
+      if (email === this.props.auth.user.email) {
+        // update the group array in the state
+        var grpArray = this.state.groups;
+        grpArray.push(grp);
+        this.setState({
+          groups: grpArray,
+        });
+      } else {
+        return;
+      }
+    });
+
+    // event of recieving a new msg on group
+    this.socket.on("message-recieved-group", (groupID, message) => {
+      if (
+        this.state.selectedGrp === null ||
+        this.state.selectedGrp._id !== groupID
+      ) {
+        // handle the notification div display
+        let grpDiv = document.querySelector(`[data-grpid="${groupID}"]`);
+        if (!grpDiv || grpDiv === null || grpDiv === undefined) {
+          return;
+        }
+        let notification = grpDiv.getElementsByTagName("div")[0];
+        notification.style.display = "block";
+      } else {
+        // handle the notification div display
+        let grpDiv = document.querySelector(`[data-grpid="${groupID}"]`);
+        if (!grpDiv || grpDiv === null || grpDiv === undefined) {
+          return;
+        }
+        let notification = grpDiv.getElementsByTagName("div")[0];
+        notification.style.display = "none";
+        // upadte teh messages array if this group is in focus
+        var msgsArray = this.state.messages;
+        msgsArray.push(message);
+        this.setState({
+          messages: msgsArray,
+        });
+      }
+    });
+
+    // event of removing participant from a group
+    this.socket.on("remove-participant-group", (email, grpID) => {
+      if (email !== this.props.auth.user.email) {
+        return;
+      }
+
+      // delete the group from the groups array in state
+      var newGroups = this.state.groups.filter((g) => {
+        return g._id !== grpID;
+      });
+      this.setState({
+        groups: newGroups,
+      });
+      // if selected group is null then return
+      if (this.state.selectedGrp === null) {
+        return;
+      }
+      // if this was the selected group then unselect the group
+      if (
+        this.state.selectedGrp !== null &&
+        this.state.selectedGrp !== undefined &&
+        this.state.selectedGrp._id === grpID
+      ) {
+        this.setState({
+          messages: [],
+          selectedGrp: null,
+        });
+      }
+    });
+  };
+
+  // function to handle the create group modal show
   handleCreateGroup = () => {
     this.setState({
       createGroup: true,
     });
   };
 
-  componentDidMount = () => {
-    this.props.dispatch(startSocketConnection());
-    this.props.dispatch(connectToSocket());
-  };
-
+  // function to focus on a group (ie show its messages in the message container)
   focusOn = (grp) => {
     this.setState({
       selectedGrp: grp,
     });
+    // if any notification remove the notification bar
     var notiDiv = document.querySelector(`[data-grpid="${grp._id}"]`);
     if (notiDiv && notiDiv !== null) {
       notiDiv = notiDiv.getElementsByTagName("div")[0];
@@ -179,79 +191,84 @@ class Chats extends Component {
     });
   };
 
+  // track the message input change
   handleMsgInputChange = (e) => {
     this.setState({
       msgInput: e.target.value,
     });
   };
 
+  // track the group name input change
   handleGroupNameChange = (e) => {
     this.setState({
       newGrpName: e.target.value,
     });
   };
 
+  // function to send the message
   sendAMessage = (e) => {
     e.preventDefault();
+    // dont send message if its empty or just spaces
     if (this.state.msgInput.trim() === "") {
       return;
     }
+    var msgToSend = this.state.msgInput.split("\n").join("<br/>");
     this.props
       .dispatch(
         sendMessage(
           this.props.auth.user.email,
           this.state.selectedGrp._id,
-          this.state.msgInput
+          msgToSend
         )
       )
       .then(() => {
-        this.socket.emit("send-message-group", this.state.selectedGrp._id);
-        this.props
-          .dispatch(getMessages(this.state.selectedGrp._id))
-          .then(() => {
-            console.log(this.props.group.messages);
-            this.setState(
-              {
-                messages: this.props.group.messages,
-              },
-              () => {
-                this.props.dispatch(clearGroupState());
-              }
-            );
-          });
+        // after successfully sending the message
+        if (this.props.message.success) {
+          this.socket.emit(
+            "send-message-group",
+            this.state.selectedGrp._id,
+            this.props.message.msg
+          );
+        }
       });
+    // set the msg input as empty string
     this.setState({
       msgInput: "",
     });
   };
 
+  // function to create a group
   handleCreateGroupRequest = (e) => {
-    // e.preventDeafult();
+    e.preventDefault();
+    // if group name is empty or just spaces dont create the group
     if (this.state.newGrpName.trim() === "") {
       return;
     }
     this.props
       .dispatch(createGroup(this.props.auth.user.email, this.state.newGrpName))
       .then(() => {
-        this.props.dispatch(getGroups(this.props.auth.user.email)).then(() => {
-          if (this.props.auth.groups != null) {
-            this.setState(
-              {
-                groups: this.props.auth.groups,
-              },
-              () => {
-                this.props.dispatch(clearGroupState());
-              }
-            );
-          }
-        });
+        // update the groups array in the state if group successfully created
+        if (this.props.group.success) {
+          var grpsArray = this.state.groups;
+          grpsArray.push({
+            name: this.props.group.id.name,
+            _id: this.props.group.id._id,
+          });
+          this.setState({
+            groups: grpsArray,
+          });
+        }
+        // clear the groupstate
+        this.props.dispatch(clearGroupState());
       });
+    // clear the group name and dont show the group create modal
     this.setState({
       createGroup: false,
       newGrpName: "",
     });
   };
 
+  // if group creation aborted
   handleCancelGrpCreation = (e) => {
     e.preventDefault();
     this.setState({
@@ -260,6 +277,7 @@ class Chats extends Component {
     });
   };
 
+  // function to handle the instant meeting event
   createInstantMeeting = (e) => {
     e.preventDefault();
     const newRoomUrl =
@@ -269,22 +287,23 @@ class Chats extends Component {
       "-" +
       randstr({ length: 5, type: "alphanumeric" });
     const self = this;
+    // create a room and open a new window with the url
     this.props.dispatch(startRoom());
     this.props.dispatch(createRoom(newRoomUrl)).then(() => {
       if (self.props.room.success) {
         window.open(`${baseUrl}/room/${newRoomUrl}`);
-      } else {
-        console.log(self.props.room.error);
       }
     });
   };
 
+  // track the participant email input change
   handleParticipantEmailChange = (e) => {
     this.setState({
       newParticipantsEmail: e.target.value,
     });
   };
 
+  // handle the show add particpinat modal
   addParticipant = (e) => {
     e.preventDefault();
     this.setState({
@@ -292,11 +311,14 @@ class Chats extends Component {
     });
   };
 
+  // add participant event
   addParticipantEvent = (e) => {
     e.preventDefault();
+    // dont add if email is null or is just spaces
     if (this.state.newParticipantsEmail.trim() === "") {
       return;
     }
+    // dispatch add memeber
     this.props
       .dispatch(
         addMember(
@@ -306,11 +328,15 @@ class Chats extends Component {
         )
       )
       .then(() => {
-        this.socket.emit(
-          "add-participant-group",
-          this.state.newParticipantsEmail,
-          this.state.selectedGrp._id
-        );
+        // emit the add participant event
+        if (this.props.group.success) {
+          this.socket.emit(
+            "add-participant-group",
+            this.state.newParticipantsEmail,
+            this.state.selectedGrp
+          );
+        }
+        // display the div fro 2 secs with the error or success notification
         setTimeout(() => {
           var newmail = this.state.newParticipantsEmail;
           this.setState({
@@ -318,8 +344,10 @@ class Chats extends Component {
             newParticipantsEmail: "",
           });
           var success = this.props.group.success;
+          // clear the group state
           this.props.dispatch(clearGroupState());
           if (success !== null) {
+            // send the message in group of adding a new participant
             this.props
               .dispatch(
                 sendMessage(
@@ -329,34 +357,26 @@ class Chats extends Component {
                 )
               )
               .then(() => {
-                this.socket.emit(
-                  "send-message-group",
-                  this.state.selectedGrp._id
-                );
-                this.props
-                  .dispatch(getMessages(this.state.selectedGrp._id))
-                  .then(() => {
-                    console.log(this.props.group.messages);
-                    this.setState(
-                      {
-                        messages: this.props.group.messages,
-                      },
-                      () => {
-                        this.props.dispatch(clearGroupState());
-                      }
-                    );
-                  });
+                if (this.props.message.success) {
+                  this.socket.emit(
+                    "send-message-group",
+                    this.state.selectedGrp._id,
+                    this.props.message.msg
+                  );
+                }
               });
           }
         }, 2000);
       });
   };
 
+  // handle the show participants list modal
   showParticipantsList = (e) => {
     e.preventDefault();
     this.setState({
       showParticipantsList: true,
     });
+    // get the participants and update the state
     this.props
       .dispatch(getParticipants(this.state.selectedGrp._id))
       .then(() => {
@@ -374,6 +394,7 @@ class Chats extends Component {
       });
   };
 
+  // function to abort the participant addition
   handleCancelParticipantAddition = (e) => {
     e.preventDefault();
     this.setState({
@@ -382,6 +403,7 @@ class Chats extends Component {
     });
   };
 
+  // function to close the participants list
   closeParticipantsList = (e) => {
     e.preventDefault();
     this.setState({
@@ -389,6 +411,7 @@ class Chats extends Component {
     });
   };
 
+  // function to create a meet in the group
   createAMeetInGroup = (e) => {
     e.preventDefault();
     const newRoomUrl =
@@ -401,6 +424,7 @@ class Chats extends Component {
     this.props.dispatch(startRoom());
     this.props.dispatch(createRoom(newRoomUrl)).then(() => {
       if (self.props.room.success) {
+        // open the window with the meet and send the meet url to the group as a msg
         window.open(`${baseUrl}/room/${newRoomUrl}`);
         this.props
           .dispatch(
@@ -411,7 +435,13 @@ class Chats extends Component {
             )
           )
           .then(() => {
-            this.socket.emit("send-message-group", this.state.selectedGrp._id);
+            if (this.props.message.success) {
+              this.socket.emit(
+                "send-message-group",
+                this.state.selectedGrp._id,
+                this.props.message.msg
+              );
+            }
           });
       } else {
         console.log(self.props.room.error);
@@ -419,16 +449,20 @@ class Chats extends Component {
     });
   };
 
+  // function to remove a participant
   handleRemoveParticipant = (by, to) => {
     this.props
       .dispatch(removeMember(by, to, this.state.selectedGrp._id))
       .then(() => {
         if (this.props.group.success !== null) {
+          // if removed successfully then emit the sokcet event as well as
+          // send a message to the group that participant has been removed
           this.socket.emit(
             "remove-participant-group",
             to,
             this.state.selectedGrp._id
           );
+          this.props.dispatch(clearGroupState());
           this.props
             .dispatch(
               sendMessage(
@@ -438,23 +472,13 @@ class Chats extends Component {
               )
             )
             .then(() => {
-              this.socket.emit(
-                "send-message-group",
-                this.state.selectedGrp._id
-              );
-              this.props
-                .dispatch(getMessages(this.state.selectedGrp._id))
-                .then(() => {
-                  console.log(this.props.group.messages);
-                  this.setState(
-                    {
-                      messages: this.props.group.messages,
-                    },
-                    () => {
-                      this.props.dispatch(clearGroupState());
-                    }
-                  );
-                });
+              if (this.props.message.success) {
+                this.socket.emit(
+                  "send-message-group",
+                  this.state.selectedGrp._id,
+                  this.props.message.msg
+                );
+              }
             });
         }
       });
@@ -463,7 +487,17 @@ class Chats extends Component {
     });
   };
 
+  // function to send the message with enter key
+  sendMessageEnter = (e) => {
+    if (e.key === "Enter" && e.shiftKey) {
+      return;
+    } else if (e.key === "Enter") {
+      this.sendAMessage(e);
+    }
+  };
+
   render() {
+    // redirect to home if not logged in
     if (!this.props.auth.isLoggedIn) {
       return <Redirect to='/' />;
     }
@@ -473,6 +507,7 @@ class Chats extends Component {
         <div className='container'>
           {this.state.createGroup && (
             <div className='create-group-modal'>
+              {/* Create a group modal */}
               <Paper className='create-group-paper'>
                 <Typography variant='h4'>CREATE A GROUP</Typography>
                 <TextField
@@ -507,6 +542,7 @@ class Chats extends Component {
 
           {this.state.showParticipantsList && (
             <div className='create-group-modal'>
+              {/* Participant slist modal */}
               <Paper className='create-group-paper'>
                 <Typography variant='h4'>PARTICIPANTS</Typography>
                 <div className='participants-container'>
@@ -574,6 +610,7 @@ class Chats extends Component {
 
           {this.state.showAddParticipant && (
             <div className='create-group-modal'>
+              {/* Add participnat modal */}
               <Paper className='create-group-paper'>
                 {this.props.group.success !== null && (
                   <Alert severity='success'>{this.props.group.success}</Alert>
@@ -633,7 +670,11 @@ class Chats extends Component {
             <div className='centerd'>
               <Typography variant='h4'>GROUPS</Typography>
             </div>
+            {/* Groups of user */}
             <div className='grp-container'>
+              {this.state.groups.length <= 0 && (
+                <div style={{ padding: "0.5rem" }}>No groups to show</div>
+              )}
               {this.state.groups.map((group) => {
                 return (
                   <div
@@ -654,9 +695,12 @@ class Chats extends Component {
               })}
             </div>
           </div>
+          {/* Messages in vthe group */}
           <div className='group-messages'>
             {this.state.selectedGrp === null ? (
-              <div>Select a group to view messages</div>
+              <div style={{ padding: "1rem" }}>
+                Select a group to view messages
+              </div>
             ) : (
               <div>
                 <div className='buttons-grp-settings'>
@@ -711,7 +755,12 @@ class Chats extends Component {
                   )}
                 </div>
 
-                <form onSubmit={this.sendAMessage} className='send-text-form'>
+                {/* Send a message to group form */}
+                <form
+                  onSubmit={this.sendAMessage}
+                  onKeyPress={this.sendMessageEnter}
+                  className='send-text-form'
+                >
                   <div className='textbox'>
                     <TextField
                       classes={{ root: "message-input" }}
@@ -739,12 +788,14 @@ class Chats extends Component {
   }
 }
 
+// get the access of the required state in the props
 function mapStateToProps(state) {
   return {
     auth: state.auth,
     socket: state.socket,
     group: state.group,
     room: state.room,
+    message: state.message,
   };
 }
 

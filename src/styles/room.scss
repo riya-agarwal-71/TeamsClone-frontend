@@ -79,6 +79,11 @@
 #my-video {
   width: 640px;
   height: 480px;
+  position: relative;
+}
+
+.curved-radius {
+  border-radius: 10px;
 }
 
 .joining-info {

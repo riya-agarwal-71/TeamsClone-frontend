@@ -1,3 +1,4 @@
+// signup component (form to sign up a user)
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Redirect } from "react-router-dom";
@@ -14,6 +15,7 @@ import { Visibility, VisibilityOff } from "@material-ui/icons";
 import { signup, startSignup, clearAuthState } from "../actions/auth";
 import "../styles/signup.scss";
 
+// react class component signup
 class Signup extends Component {
   constructor(props) {
     super(props);
@@ -29,6 +31,7 @@ class Signup extends Component {
     };
   }
 
+  // if already logged in redirect to home
   componentDidMount = () => {
     if (this.props.auth.isLoggedIn) {
       this.setState({
@@ -38,6 +41,7 @@ class Signup extends Component {
     }
   };
 
+  // change the visibility of password
   handlePassVisibilty = () => {
     const self = this;
     this.setState({
@@ -45,6 +49,7 @@ class Signup extends Component {
     });
   };
 
+  // change the visibility of confirm password
   handleconfirmPassVisiblity = () => {
     const self = this;
     this.setState({
@@ -52,30 +57,35 @@ class Signup extends Component {
     });
   };
 
+  // track the name input change
   handleNameChange = (e) => {
     this.setState({
       name: e.target.value,
     });
   };
 
+  // track the email input change
   handleEmailChange = (e) => {
     this.setState({
       email: e.target.value,
     });
   };
 
+  // track the password input change
   handlePassChange = (e) => {
     this.setState({
       password: e.target.value,
     });
   };
 
+  // track the confirm password input change
   handleConfirmPassChange = (e) => {
     this.setState({
       confirmPassword: e.target.value,
     });
   };
 
+  // submit the form (start the signup)
   handleFormSubmit = (e) => {
     e.preventDefault();
     const { password, name, confirmPassword, email } = this.state;
@@ -83,6 +93,7 @@ class Signup extends Component {
     this.props.dispatch(signup(email, password, name, confirmPassword));
   };
 
+  // redirect to login page if signup successfull
   redirectToLogin = () => {
     setTimeout(() => {
       this.setState({
@@ -93,9 +104,11 @@ class Signup extends Component {
   };
 
   render() {
+    // redirect to home
     if (this.state.redirectToHome) {
       return <Redirect to={"/"} />;
     }
+    // redirect to login
     if (this.state.redirect) {
       return (
         <Redirect
@@ -108,20 +121,25 @@ class Signup extends Component {
         <div className='main-container'>
           {this.props.auth.success && (
             <div>
+              {/* Success alert when signing up */}
               <Alert key={0} severity={"success"} classes={{ root: "alert" }}>
                 {this.props.auth.success}
               </Alert>
             </div>
           )}
+          {/* If success call the redirect to login function */}
           {this.props.auth.success ? this.redirectToLogin() : ""}
           {this.props.auth.error && (
+            // Error altert while signing up
             <Alert key={0} severity={"error"} classes={{ root: "alert" }}>
               {this.props.auth.error}
             </Alert>
           )}
+          {/* The main signup form */}
           <form onSubmit={this.handleFormSubmit}>
             <Paper className='form signup'>
               <div className='heading'>
+                {/* Heading */}
                 <Typography variant='h4'>Sign Up</Typography>
               </div>
               <div className='inputField'>
@@ -222,6 +240,7 @@ class Signup extends Component {
   }
 }
 
+// get the access to the auth state in props
 function mapStateToProps(state) {
   return {
     auth: state.auth,

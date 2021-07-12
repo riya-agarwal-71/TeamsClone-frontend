@@ -1,3 +1,4 @@
+// get all the required action types
 import {
   GROUP_START,
   GROUP_FAILED,
@@ -5,6 +6,7 @@ import {
   CLEAR_GROUP_STATE,
 } from "../actions/actionTypes";
 
+// define the initial state
 const initialState = {
   inProgress: false,
   success: null,
@@ -14,6 +16,7 @@ const initialState = {
   admin: null,
 };
 
+// the reducer function to change the group state
 export default function group(state = initialState, action) {
   switch (action.type) {
     case GROUP_START:

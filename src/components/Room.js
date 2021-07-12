@@ -1,3 +1,4 @@
+// room component (the main component which renders in the room url)
 import React, { Component } from "react";
 import { Toolbar, IconButton, Modal, Button, Badge } from "@material-ui/core";
 import {
@@ -16,6 +17,7 @@ import {
 } from "@material-ui/icons";
 import { ChatBox, Participants } from "./";
 
+// react class component for the room
 class Room extends Component {
   constructor(props) {
     super(props);
@@ -27,18 +29,19 @@ class Room extends Component {
     };
   }
 
+  // attach the resize observe on main to make the ui a bit more dynamic
   componentDidMount = () => {
     const self = this;
     var main = document.getElementById("main");
     const resize = new ResizeObserver(() => {
       self.props.getCssStyleForVideos();
     });
-    console.log(main);
     if (main !== null) {
       resize.observe(main);
     }
   };
 
+  // function to toogle the visibility of chatbox
   displayChatbox = (e) => {
     e.preventDefault();
     this.setState(
@@ -55,6 +58,7 @@ class Room extends Component {
     );
   };
 
+  // function to toggle the participants list
   displayParticipantsList = (e) => {
     e.preventDefault();
     this.setState(
@@ -70,6 +74,7 @@ class Room extends Component {
     );
   };
 
+  // function to show the badge if new msg is there and chatbox is not visible
   gotNewMessage = () => {
     if (this.state.chatboxVisible) {
       return;
@@ -108,6 +113,7 @@ class Room extends Component {
     return (
       <div className='room-container'>
         <div className='video-chat-container'>
+          {/* screen presenting div */}
           <div id='screen-share' className='my-ss-screen'>
             <div>
               <h2>You are currently Presenting</h2>
@@ -123,6 +129,7 @@ class Room extends Component {
               </Button>
             </div>
           </div>
+          {/* The main div conatining all the video elements  */}
           <div
             id='main'
             className={
@@ -139,6 +146,7 @@ class Room extends Component {
                 : "video-components width-full"
             }
           >
+            {/* My video */}
             <div className='video' data-socket={`${socketID}`}>
               <video
                 ref={myVideoRef}
@@ -187,6 +195,7 @@ class Room extends Component {
               </div>
             </div>
 
+            {/* Participants videos */}
             {participants.map((p) => {
               return (
                 <div className='video' data-socket={`${p.socketid}`}>
@@ -231,6 +240,7 @@ class Room extends Component {
               );
             })}
           </div>
+          {/* Chatbox and participants list */}
           <div
             className={
               this.state.participantsListVisible
@@ -258,6 +268,7 @@ class Room extends Component {
             />
           </div>
         </div>
+        {/* The options bar at the bottom */}
         <Toolbar
           className='options-bar in-call'
           style={{ background: "#5a5a5a" }}
@@ -266,6 +277,7 @@ class Room extends Component {
             <IconButton color='inherit' onClick={handleInfoModalOpen}>
               <Info />
             </IconButton>
+            {/* Info modal */}
             <Modal open={infoModalOpen} onClose={handleInfoModalClose}>
               <div className='joining-info'>
                 <h4>Copy Joining Info</h4>
@@ -292,6 +304,7 @@ class Room extends Component {
               </div>
             </Modal>
           </div>
+          {/* Call options */}
           <div className='call-options'>
             <IconButton color='inherit' onClick={toggleMicState}>
               {micOn ? <Mic /> : <MicOff />}
@@ -303,6 +316,7 @@ class Room extends Component {
               {videoOn ? <Videocam /> : <VideocamOff />}
             </IconButton>
           </div>
+          {/* Screen shar eparticipants and caht button */}
           <div
             style={{
               width: "10%",
@@ -313,6 +327,7 @@ class Room extends Component {
             <IconButton color='inherit' onClick={handleScreenShare}>
               {screenShare ? <StopScreenShare /> : <ScreenShare />}
             </IconButton>
+            {/* Modal if other is presenting screen */}
             <Modal open={showSSModal} onClose={handleSSModalClose}>
               <div className='ss-modal'>
                 A participant is already sharing screen

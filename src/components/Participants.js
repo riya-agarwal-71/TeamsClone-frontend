@@ -1,19 +1,23 @@
+// the component to display the participants list in the room
 import React, { Component } from "react";
 import { Typography } from "@material-ui/core";
 
 import "../styles/participants.scss";
+
+// react class component
 class Participants extends Component {
   render() {
     const participants = this.props.participants;
-    console.log(participants);
     return (
       <div className='participants-container'>
+        {/* Heading */}
         <Typography variant='h5' align='center'>
           PARTICIPANTS
         </Typography>
         <div className='participants-list'>
+          {/* Display me at the top */}
           <div
-            className='participant'
+            className='participant-video-call'
             onClick={() => this.props.focusVideoOf(this.props.socketID)}
           >
             <div className='logo'>
@@ -23,10 +27,12 @@ class Participants extends Component {
               <Typography variant='subtitle1'>ME</Typography>
             </div>
           </div>
+          {/* Display all the participants */}
+          {/* Add a onClick event listener to pin the video of the participant */}
           {participants.map((p) => {
             return (
               <div
-                className='participant'
+                className='participant-video-call'
                 onClick={() => this.props.focusVideoOf(p.socketid)}
               >
                 <div className='logo'>

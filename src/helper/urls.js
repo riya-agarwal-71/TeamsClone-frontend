@@ -1,3 +1,5 @@
+// file containing all the urls
+// url for backend
 var url;
 if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
   url = "http://localhost:8000";
@@ -5,8 +7,10 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
   url = "https://teams-clone-71.herokuapp.com";
 }
 
+// root api url
 const ROOT_API = `${url}/api`;
 
+// url for front end
 var frontUrl;
 if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
   frontUrl = "http://localhost:3000";
@@ -14,8 +18,10 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
   frontUrl = "https://teams-clone-71.netlify.app";
 }
 
+// export frontend url
 export const baseUrl = frontUrl;
 
+// export all the api urls
 export const APIUrls = {
   login: () => `${ROOT_API}/users/login`,
   signup: () => `${ROOT_API}/users/signup`,
@@ -33,4 +39,5 @@ export const APIUrls = {
   getParticipants: () => `${ROOT_API}/group/get-participants`,
 };
 
+// export the server url for the socket connection
 export const server_url = `${url}/`;

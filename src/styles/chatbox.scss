@@ -11,7 +11,7 @@
 .send-text-form {
   position: absolute;
   display: flex;
-  bottom: 1rem;
+  bottom: 2rem;
   box-sizing: border-box;
   padding-right: 2rem;
   width: 100%;
@@ -33,13 +33,9 @@
   height: 82%;
   box-sizing: border-box;
   overflow-y: scroll;
-  &::-webkit-scrollbar {
-    width: 0.5rem;
-    color: black;
-  }
 }
+
 .message {
-  margin-bottom: 1rem;
   overflow-x: wrap;
   word-wrap: break-word;
 }
