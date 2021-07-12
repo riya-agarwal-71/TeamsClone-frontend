@@ -182,7 +182,7 @@
 }
 
 .participants-container {
-  width: 100%;
+  width: 80%;
   height: 90%;
   overflow-y: scroll;
   display: flex;
@@ -191,12 +191,16 @@
 
 .participant {
   width: 100%;
-  padding: 0 1rem 0 2rem;
+  padding: 0.8rem;
+  box-sizing: border-box;
   border-radius: 20px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
+  &:hover {
+    background-color: rgb(233, 233, 233);
+  }
 }
 
 .new-msg-noti-visible {
@@ -226,4 +230,8 @@
 .my-text {
   background-color: rgb(225, 225, 245);
   margin-left: 15rem;
+}
+
+.more-length {
+  height: 70vh;
 }

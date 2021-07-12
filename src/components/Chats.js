@@ -552,7 +552,7 @@ class Chats extends Component {
           {this.state.showParticipantsList && (
             <div className='create-group-modal'>
               {/* Participant slist modal */}
-              <Paper className='create-group-paper'>
+              <Paper className='create-group-paper more-length'>
                 <Typography variant='h4'>PARTICIPANTS</Typography>
                 <div className='participants-container'>
                   {this.state.participants.map((p) => {
