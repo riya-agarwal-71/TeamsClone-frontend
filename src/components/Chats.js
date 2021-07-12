@@ -394,6 +394,7 @@ class Chats extends Component {
           this.setState({
             participants: this.props.group.messages,
             admin: this.props.group.admin,
+            inProgress: null,
           });
         } else {
           this.setState({
@@ -557,7 +558,7 @@ class Chats extends Component {
               <Paper className='create-group-paper more-length'>
                 <Typography variant='h4'>PARTICIPANTS</Typography>
                 {this.state.inProgress === "participants" ? (
-                  <div className='centerd' style={{ marginTop: "2rem" }}>
+                  <div className='centerd'>
                     <CircularProgress />
                   </div>
                 ) : (
