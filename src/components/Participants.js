@@ -9,7 +9,7 @@ class Participants extends Component {
   render() {
     const participants = this.props.participants;
     return (
-      <div className='participants-container'>
+      <div className='participants-container' style={{ width: "100%" }}>
         {/* Heading */}
         <Typography variant='h5' align='center'>
           PARTICIPANTS
