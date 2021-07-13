@@ -418,6 +418,7 @@ class RoomWrapper extends Component {
         },
         () => {
           // send my stream to the person being added if i am not the one added
+          if(socketid === self.socketID) return
           if (window.myStream !== undefined && window.myStream !== null) {
             window.myStream.getTracks().forEach((track) => {
               self.connections[socketid].addTrack(track, window.myStream);
@@ -428,11 +429,11 @@ class RoomWrapper extends Component {
               self.connections[socketid].addTrack(track, window.myStream);
             });
           }
-          self.sendStreamToPeer(window.myStream);
           self.getCssStyleForVideos();
         }
       );
       // add on track event listener
+      if (socketid === self.socketID) continue
       self.connections[socketid].ontrack = (event) => {
         // set the stream to the video elemnet of the user (identified by socketid)
         var searchVideo = document.querySelector(`[data-socket="${socketid}"]`);
@@ -447,6 +448,9 @@ class RoomWrapper extends Component {
         self.getCssStyleForVideos();
       };
     });
+
+    if(socketid === self.socketID) self.sendStreamToPeer(window.myStream)
+
   };
 
   // function to handle teh screen share socket event
