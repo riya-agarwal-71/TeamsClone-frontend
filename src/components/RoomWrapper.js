@@ -441,6 +441,7 @@ class RoomWrapper extends Component {
           self.connections[socketid].addTrack(track, window.myStream);
         });
       }
+      self.getCssStyleForVideos();
     });
   };
 
