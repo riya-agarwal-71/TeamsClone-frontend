@@ -412,38 +412,44 @@ class RoomWrapper extends Component {
       participants.sort((p1, p2) =>
         p1.username > p2.username ? 1 : p1.username < p2.username ? -1 : 0
       );
-      self.setState({
-        members: participants,
-      });
-
-      // add on track event listener
-      self.connections[socketid].ontrack = (event) => {
-        // set the stream to the video elemnet of the user (identified by socketid)
-        var searchVideo = document.querySelector(`[data-socket="${socketid}"]`);
-        var vid = searchVideo.getElementsByTagName("video")[0];
-        vid.srcObject = event.streams[0];
-        var noVidDiv = searchVideo.children[searchVideo.children.length - 1];
-        if (event.streams[0].getVideoTracks().length <= 0) {
-          noVidDiv.setAttribute("class", "no-video-container");
-        } else {
-          noVidDiv.setAttribute("class", "dont-show");
+      self.setState(
+        {
+          members: participants,
+        },
+        () => {
+          // add on track event listener
+          self.connections[socketid].ontrack = (event) => {
+            // set the stream to the video elemnet of the user (identified by socketid)
+            var searchVideo = document.querySelector(
+              `[data-socket="${socketid}"]`
+            );
+            var vid = searchVideo.getElementsByTagName("video")[0];
+            vid.srcObject = event.streams[0];
+            var noVidDiv =
+              searchVideo.children[searchVideo.children.length - 1];
+            if (event.streams[0].getVideoTracks().length <= 0) {
+              noVidDiv.setAttribute("class", "no-video-container");
+            } else {
+              noVidDiv.setAttribute("class", "dont-show");
+            }
+            self.getCssStyleForVideos();
+          };
+          // send my stream to the person being added if i am not the one added
+          if (window.myStream !== undefined && window.myStream !== null) {
+            window.myStream.getTracks().forEach((track) => {
+              self.connections[socketid].addTrack(track, window.myStream);
+            });
+          } else {
+            window.myStream = self.silence();
+            window.myStream.getTracks().forEach((track) => {
+              self.connections[socketid].addTrack(track, window.myStream);
+            });
+          }
+          self.getCssStyleForVideos();
         }
-        self.getCssStyleForVideos();
-      };
-      // send my stream to the person being added if i am not the one added
-      if (window.myStream !== undefined && window.myStream !== null) {
-        window.myStream.getTracks().forEach((track) => {
-          self.connections[socketid].addTrack(track, window.myStream);
-        });
-      } else {
-        window.myStream = self.silence();
-        window.myStream.getTracks().forEach((track) => {
-          self.connections[socketid].addTrack(track, window.myStream);
-        });
-      }
-      self.getCssStyleForVideos();
+      );
+      self.sendStreamToPeer(window.myStream);
     });
-    self.sendStreamToPeer(window.myStream);
   };
 
   // function to handle teh screen share socket event
