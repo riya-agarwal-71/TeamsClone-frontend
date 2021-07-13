@@ -428,9 +428,9 @@ class RoomWrapper extends Component {
               self.connections[socketid].addTrack(track, window.myStream);
             });
           }
+          self.sendStreamToPeer(window.myStream);
           self.getCssStyleForVideos();
         }
-        self.sendStreamToPeer(window.myStream);
       );
       // add on track event listener
       self.connections[socketid].ontrack = (event) => {
