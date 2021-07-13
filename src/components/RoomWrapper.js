@@ -554,6 +554,7 @@ class RoomWrapper extends Component {
       this.setState({
         members: newParticipants,
       });
+      if (socketid !== self.socketID) self.sendStreamToPeer();
       self.getCssStyleForVideos();
     });
 
