@@ -417,23 +417,6 @@ class RoomWrapper extends Component {
           members: participants,
         },
         () => {
-          // add on track event listener
-          self.connections[socketid].ontrack = (event) => {
-            // set the stream to the video elemnet of the user (identified by socketid)
-            var searchVideo = document.querySelector(
-              `[data-socket="${socketid}"]`
-            );
-            var vid = searchVideo.getElementsByTagName("video")[0];
-            vid.srcObject = event.streams[0];
-            var noVidDiv =
-              searchVideo.children[searchVideo.children.length - 1];
-            if (event.streams[0].getVideoTracks().length <= 0) {
-              noVidDiv.setAttribute("class", "no-video-container");
-            } else {
-              noVidDiv.setAttribute("class", "dont-show");
-            }
-            self.getCssStyleForVideos();
-          };
           // send my stream to the person being added if i am not the one added
           if (window.myStream !== undefined && window.myStream !== null) {
             window.myStream.getTracks().forEach((track) => {
@@ -447,8 +430,22 @@ class RoomWrapper extends Component {
           }
           self.getCssStyleForVideos();
         }
+        self.sendStreamToPeer(window.myStream);
       );
-      self.sendStreamToPeer(window.myStream);
+      // add on track event listener
+      self.connections[socketid].ontrack = (event) => {
+        // set the stream to the video elemnet of the user (identified by socketid)
+        var searchVideo = document.querySelector(`[data-socket="${socketid}"]`);
+        var vid = searchVideo.getElementsByTagName("video")[0];
+        vid.srcObject = event.streams[0];
+        var noVidDiv = searchVideo.children[searchVideo.children.length - 1];
+        if (event.streams[0].getVideoTracks().length <= 0) {
+          noVidDiv.setAttribute("class", "no-video-container");
+        } else {
+          noVidDiv.setAttribute("class", "dont-show");
+        }
+        self.getCssStyleForVideos();
+      };
     });
   };
 
@@ -558,10 +555,16 @@ class RoomWrapper extends Component {
       }
       var participants = this.state.members;
       var newParticipants = participants.filter((p) => p.socketid !== socketid);
-      this.setState({
-        members: newParticipants,
-      });
-      if (socketid !== self.socketID) self.sendStreamToPeer(window.myStream);
+      this.setState(
+        {
+          members: newParticipants,
+        },
+        () => {
+          if (socketid !== self.socketID)
+            self.sendStreamToPeer(window.myStream);
+        }
+      );
+
       self.getCssStyleForVideos();
     });
 
