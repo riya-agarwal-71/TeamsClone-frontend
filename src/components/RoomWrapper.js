@@ -443,6 +443,7 @@ class RoomWrapper extends Component {
       }
       self.getCssStyleForVideos();
     });
+    self.sendStreamToPeer();
   };
 
   // function to handle teh screen share socket event
