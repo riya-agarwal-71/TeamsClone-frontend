@@ -449,7 +449,7 @@ class RoomWrapper extends Component {
       };
     });
 
-    if (socketid === self.socketID) self.sendStreamToPeer(window.myStream);
+    if (id === self.socketID) self.sendStreamToPeer(window.myStream);
   };
 
   // function to handle teh screen share socket event
