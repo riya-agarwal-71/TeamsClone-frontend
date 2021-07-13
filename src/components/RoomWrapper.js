@@ -430,8 +430,6 @@ class RoomWrapper extends Component {
         }
         self.getCssStyleForVideos();
       };
-      // if i am the one being added then return
-      if (id === self.socketID) return;
       // send my stream to the person being added if i am not the one added
       if (window.myStream !== undefined && window.myStream !== null) {
         window.myStream.getTracks().forEach((track) => {
@@ -444,8 +442,6 @@ class RoomWrapper extends Component {
         });
       }
     });
-    // if i am the one added then send my stream to all the peers
-    if (id === self.socketID) self.sendStreamToPeer(window.myStream);
   };
 
   // function to handle teh screen share socket event
